@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 # Feodo Tracker sync (abuse.ch)
 set -euo pipefail
 

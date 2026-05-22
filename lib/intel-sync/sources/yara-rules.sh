@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 # YARA rules sync (Neo23x0/signature-base)
 set -euo pipefail
 

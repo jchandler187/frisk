@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs — ClawSec Intel Sync
 # ClawSec v2 - Intel Sync Orchestrator
 # Runs all intel source sync jobs, gracefully handling failures
 set -euo pipefail

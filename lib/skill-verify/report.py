@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# ⚡ Low Watt Labs — ClawSec Skill Verification Report
 """ClawSec v2 - Report Generator
 
 Aggregates check results into a final JSON report with verdict.

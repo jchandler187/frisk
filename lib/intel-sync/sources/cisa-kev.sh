@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 # CISA KEV sync
 set -euo pipefail
 

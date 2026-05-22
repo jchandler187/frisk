@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs — ClawSec
 # ClawSec v2 - Static Analysis (Semgrep)
 set -euo pipefail
 

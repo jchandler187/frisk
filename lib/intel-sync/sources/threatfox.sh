@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 # ThreatFox sync (abuse.ch)
 set -euo pipefail
 

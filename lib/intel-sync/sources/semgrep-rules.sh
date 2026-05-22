@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 set -euo pipefail
 source "$(dirname "$0")/../../common/config.sh"
 source "$(dirname "$0")/../../common/colors.sh"

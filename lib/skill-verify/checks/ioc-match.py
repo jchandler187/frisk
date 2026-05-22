@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ⚡ Low Watt Labs
 """ClawSec v2 - IOC Extraction & Match
 
 Extracts URLs, IPs, domains, hashes from skill code and matches against

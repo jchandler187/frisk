@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ⚡ Low Watt Labs
 """ClawSec v2 - Dependency Scan
 
 Scans skill dependencies against local OSV + CISA KEV + EPSS caches.

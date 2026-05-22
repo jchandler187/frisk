@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs
 # OSV sync - npm and PyPI ecosystems
 # Downloads OSV advisories and builds a consolidated index for fast lookups
 set -euo pipefail

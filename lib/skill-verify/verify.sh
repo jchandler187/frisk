@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs — ClawSec Skill Verify Orchestrator
 # ClawSec v2 - Skill Verify Orchestrator
 # Runs all 7 security checks against a skill, produces JSON report
 set -euo pipefail
@@ -18,7 +18,7 @@ if [[ -d "$VENV" ]]; then
 fi
 
 usage() {
-    echo "ClawSec v${VERSION} — Skill Verification"
+    echo "⚡ ClawSec v${VERSION} — Skill Verification"
     echo ""
     echo "Usage: verify.sh [OPTIONS] <skill_path>"
     echo ""
@@ -176,9 +176,9 @@ else
 fi
 
 if [[ $json_only -eq 0 ]]; then
-    echo -e "${BOLD}╔═══════════════════════════════════════════╗${RESET}"
-    echo -e "${BOLD}║  ClawSec v${VERSION} — Skill Verification     ║${RESET}"
-    echo -e "${BOLD}╚═══════════════════════════════════════════╝${RESET}"
+    echo -e "${BOLD}⚡═══════════════════════════════════════════⚡${RESET}"
+    echo -e "${BOLD}⚡   ClawSec v${VERSION} — Skill Verification     ⚡${RESET}"
+    echo -e "${BOLD}⚡═══════════════════════════════════════════⚡${RESET}"
     echo ""
     echo -e "  Target: ${CYAN}${skill_path}${RESET}"
     echo -e "  Checks: ${BOLD}${#CHECKS[@]}${RESET} of ${#ALL_CHECKS[@]}"

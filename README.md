@@ -1,4 +1,4 @@
-# ClawSec v2 — Security Verification for ClawHub Skills
+# ⚡ Low Watt Labs — ClawSec v2
 
 Professional security verification tool that scans ClawHub skills against 10 continuously-updated threat intelligence sources using 7 autonomous security checks.
 

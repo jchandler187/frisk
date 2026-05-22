@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ⚡ Low Watt Labs
 """ClawSec v2 - Prompt Injection Pattern Detection
 
 Scans SKILL.md and config files for instruction override, role manipulation,

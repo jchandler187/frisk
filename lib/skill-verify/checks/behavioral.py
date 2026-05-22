@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# ⚡ Low Watt Labs
 """ClawSec v2 - Behavioral Heuristics
 
 Flags dangerous behavior patterns in skill code:

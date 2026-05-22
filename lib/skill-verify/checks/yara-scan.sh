@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# ⚡ Low Watt Labs — ClawSec
 # ClawSec v2 - YARA Scan
 set -euo pipefail
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""ClawSec v2 - Professional Security Verification CLI
+# ⚡ Low Watt Labs — ClawSec
+"""⚡ ClawSec v2 — Skill Security Verification
 
 Usage:
     clawsec scan <slug|path>   Verify a skill
