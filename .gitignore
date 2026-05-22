@@ -1,0 +1,9 @@
+reports/*.json
+.venv/
+node_modules/
+api/api-keys.json
+*.log
+__pycache__/
+.env
+*.pyc
+intel/

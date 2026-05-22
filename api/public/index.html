@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClawSec — Security Verification for ClawHub Skills</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: #0d1117; color: #c9d1d9; line-height: 1.6;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+        header { padding: 40px 0; border-bottom: 1px solid #21262d; }
+        h1 { font-size: 2.4em; color: #f0f6fc; margin-bottom: 8px; }
+        h1 span { color: #2ea043; }
+        .tagline { color: #8b949e; font-size: 1.1em; }
+        section { padding: 48px 0; }
+        h2 { color: #f0f6fc; font-size: 1.5em; margin-bottom: 16px; }
+        p { color: #8b949e; margin-bottom: 16px; }
+        .checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .check {
+            background: #161b22; border: 1px solid #21262d; border-radius: 8px;
+            padding: 20px;
+        }
+        .check h3 { color: #f0f6fc; font-size: 1em; margin-bottom: 8px; }
+        .check p { font-size: 0.9em; margin: 0; }
+        .badge { display: inline-block; margin: 8px 0; }
+        .api-example {
+            background: #161b22; border: 1px solid #21262d; border-radius: 8px;
+            padding: 16px; font-family: monospace; font-size: 0.9em;
+            color: #79c0ff; overflow-x: auto; margin: 16px 0;
+        }
+        .cta {
+            display: inline-block; background: #2ea043; color: #fff;
+            padding: 12px 24px; border-radius: 6px; text-decoration: none;
+            font-weight: 600; margin-top: 8px;
+        }
+        .cta:hover { background: #3fb950; }
+        footer { padding: 24px 0; border-top: 1px solid #21262d; color: #484f58; font-size: 0.85em; }
+        a { color: #58a6ff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Claw<span>Sec</span></h1>
+            <p class="tagline">Security verification for ClawHub skills. 7 checks. 10 intel sources. One verdict.</p>
+            <div class="badge">
+                <img src="/api/v1/badge/demo-pass.svg" alt="ClawSec badge" onerror="this.style.display='none'">
+            </div>
+        </header>
+
+        <section>
+            <h2>How it works</h2>
+            <p>ClawSec runs 7 autonomous security checks against any ClawHub skill, backed by 10 continuously-updated threat intelligence sources. Results in under 5 seconds.</p>
+            <div class="checks">
+                <div class="check">
+                    <h3>🔍 Dependency Scan</h3>
+                    <p>Match dependencies against OSV, CISA KEV, and rank by EPSS probability scores.</p>
+                </div>
+                <div class="check">
+                    <h3>📜 Static Analysis</h3>
+                    <p>Semgrep with 3500+ community rules for vulnerability patterns.</p>
+                </div>
+                <div class="check">
+                    <h3>🔑 Secret Scan</h3>
+                    <p>Gitleaks detects leaked API keys, tokens, and credentials.</p>
+                </div>
+                <div class="check">
+                    <h3>🦠 YARA Scan</h3>
+                    <p>Neo23x0 signature-base rules for malware, packers, and suspicious patterns.</p>
+                </div>
+                <div class="check">
+                    <h3>🎯 IOC Match</h3>
+                    <p>Extract and match URLs, IPs, hashes against URLhaus, ThreatFox, Feodo, MalwareBazaar.</p>
+                </div>
+                <div class="check">
+                    <h3>⚠️ Behavioral Heuristics</h3>
+                    <p>Detect shell injection, system writes, fetch-exec, and base64 payloads.</p>
+                </div>
+                <div class="check">
+                    <h3>🛡️ Prompt Injection</h3>
+                    <p>Scan for instruction overrides, role manipulation, and safety bypasses.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>API</h2>
+            <p>Integrate ClawSec verification into your CI/CD pipeline or skill registry.</p>
+            <div class="api-example">
+POST /api/v1/scan
+Content-Type: application/json
+
+{ "slug": "tesseract-image-ocr" }
+
+→ { "report_id": "a1b2c3d4", "verdict": "pass", ... }
+            </div>
+            <div class="api-example">
+GET /api/v1/badge/a1b2c3d4.svg
+
+→ SVG trust badge for your README
+            </div>
+            <a href="/pricing.html" class="cta">View Pricing →</a>
+        </section>
+
+        <section>
+            <h2>CLI</h2>
+            <p>Run locally, no API required.</p>
+            <div class="api-example">
+$ clawsec scan ./my-skill
+$ clawsec sync
+$ clawsec status
+$ clawsec report a1b2c3d4
+            </div>
+            <p>Install: <code>pip install clawsec</code> or <code>npm i -g @lowwattlabs/clawsec</code></p>
+        </section>
+
+        <footer>
+            ClawSec v2.0.0 — Built by <a href="https://lowwattlabs.com">Low Watt Labs</a> · 
+            Intel sources: CISA KEV, OSV, EPSS, abuse.ch (MalwareBazaar, URLhaus, ThreatFox, Feodo), Neo23x0 YARA, Semgrep rules
+        </footer>
+    </div>
+</body>
+</html>
