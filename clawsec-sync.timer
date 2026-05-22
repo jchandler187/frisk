@@ -3,7 +3,6 @@ Description=ClawSec Intel Sync Timer
 
 [Timer]
 OnCalendar=daily
-OnBootSec=10min
 Persistent=true
 
 [Install]

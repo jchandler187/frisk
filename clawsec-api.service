@@ -5,9 +5,9 @@ After=network.target
 [Service]
 Type=simple
 User=openclaw
-WorkingDirectory=/home/openclaw/clawsec-v2
+WorkingDirectory=/home/openclaw/projects/clawsec
 ExecStart=/usr/bin/node api/src/server.js
-Environment=PATH=/home/openclaw/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/home/openclaw/.local/bin:/home/openclaw/bin:/usr/local/bin:/usr/bin:/bin
 Environment=CLAWSEC_PORT=3100
 Environment=NODE_ENV=production
 Restart=on-failure

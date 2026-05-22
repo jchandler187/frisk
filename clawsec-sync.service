@@ -4,9 +4,9 @@ Description=ClawSec Intel Sync Service
 [Service]
 Type=oneshot
 User=openclaw
-WorkingDirectory=/home/openclaw/clawsec-v2
-ExecStart=/bin/bash /home/openclaw/clawsec-v2/lib/intel-sync/sync.sh
-Environment=PATH=/home/openclaw/.local/bin:/usr/local/bin:/usr/bin:/bin
+WorkingDirectory=/home/openclaw/projects/clawsec
+ExecStart=/bin/bash /home/openclaw/projects/clawsec/lib/intel-sync/sync.sh
+Environment=PATH=/home/openclaw/.local/bin:/home/openclaw/bin:/usr/local/bin:/usr/bin:/bin
 
 [Install]
 WantedBy=default.target
