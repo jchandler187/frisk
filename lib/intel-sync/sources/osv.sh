@@ -3,6 +3,10 @@
 # Downloads OSV advisories and builds a consolidated index for fast lookups
 set -euo pipefail
 
+# Run at low priority so this never starves other processes
+renice -n 15 $$ >/dev/null 2>&1 || true
+ionice -c 3 -p $$ 2>/dev/null || true
+
 source "$(dirname "$0")/../../common/config.sh"
 source "$(dirname "$0")/../../common/colors.sh"
 source "$(dirname "$0")/../../common/log.sh"
