@@ -132,8 +132,9 @@ def check_intel_cache():
 
 
 def extract_iocs(skill_path):
-    """Extract IOCs from all files in skill directory."""
+    """Extract IOCs and homoglyph detections from all files in skill directory."""
     iocs = {"urls": set(), "ips": set(), "domains": set(), "hashes": set()}
+    homoglyphs = []  # list of {original, normalized, type} dicts
     skill_path = Path(skill_path)
 
     for fpath in skill_path.rglob("*"):
@@ -143,9 +144,38 @@ def extract_iocs(skill_path):
             continue
         try:
             content = fpath.read_text(errors='ignore')
+            raw_content = content
             content = normalize(content)  # P0-6: normalize before extraction
         except Exception:
             continue
+
+        # P0: Detect homoglyph substitution — flag when normalization changed text
+        # Use a Unicode-aware pattern for raw content, since DOMAIN_PATTERN
+        # only matches Latin chars and misses Cyrillic/Greek homoglyphs.
+        HOMOGLYPH_DOMAIN_RE = re.compile(
+            r'(?:[\w\u0100-\u024f\u0400-\u04ff](?:[\w\u0100-\u024f\u0400-\u04ff-]*[\w\u0100-\u024f\u0400-\u04ff])?\.)+(?:com|net|org|io|dev|app|xyz|top|info|biz|cc|tk|ml|ga|cf|gq)\b',
+            re.IGNORECASE
+        )
+        if raw_content != content:
+            for url in URL_PATTERN.findall(raw_content):
+                norm_url = normalize(url)
+                if url != norm_url:
+                    homoglyphs.append({
+                        "type": "homoglyph_url",
+                        "original": url,
+                        "normalized": norm_url,
+                    })
+            for dom in HOMOGLYPH_DOMAIN_RE.findall(raw_content):
+                norm_dom = normalize(dom)
+                # Flag ANY domain where normalization changed characters,
+                # even if the normalized version is a "safe" domain.
+                # A homoglyph of google.com IS the attack — that's the whole point.
+                if dom != norm_dom:
+                    homoglyphs.append({
+                        "type": "homoglyph_domain",
+                        "original": dom,
+                        "normalized": norm_dom,
+                    })
 
         for url in URL_PATTERN.findall(content):
             # Strip trailing punctuation
@@ -169,7 +199,7 @@ def extract_iocs(skill_path):
             if not re.match(r'^[0-9a-f]{64}$', h) or len(set(h.lower())) > 4:
                 iocs["hashes"].add(h.lower())
 
-    return iocs
+    return iocs, homoglyphs
 
 def load_feodo_ips():
     """Load Feodo Tracker C2 IPs."""
@@ -264,7 +294,19 @@ def check_ioc_match(skill_path):
         results["errors"].append("intel cache directory missing")
         return results
 
-    iocs = extract_iocs(skill_path)
+    iocs, homoglyphs = extract_iocs(skill_path)
+
+    # Emit homoglyph detections as critical findings
+    for hg in homoglyphs:
+        results["findings"].append({
+            "type": hg["type"],
+            "category": "ioc_match",
+            "severity": "critical",
+            "description": f"Homoglyph detected: '{hg['original']}' normalizes to '{hg['normalized']}' — potential phishing/poisoning attack",
+            "original": hg["original"],
+            "normalized": hg["normalized"],
+            "source": "homoglyph_detection"
+        })
     results["extracted"] = {
         "urls": len(iocs["urls"]),
         "ips": len(iocs["ips"]),
