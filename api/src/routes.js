@@ -63,8 +63,20 @@ router.post('/scan', (req, res) => {
             } else if (typeof content === 'object') {
                 // Object with file contents
                 for (const [filename, fileContent] of Object.entries(content)) {
-                    const filePath = path.join(tmpDir, filename);
-                    fs.mkdirSync(path.dirname(filePath), { recursive: true });
+                    // P0: Sanitize filename against path traversal
+                    const safeName = path.basename(filename).replace(/\.\./g, '');
+                    if (safeName !== filename || filename.includes('..')) {
+                        return res.status(400).json({ error: `Invalid filename: ${filename}` });
+                    }
+                    // P0: Ensure resolved path stays within tmpDir
+                    const filePath = path.resolve(tmpDir, filename);
+                    if (!filePath.startsWith(path.resolve(tmpDir) + path.sep)) {
+                        return res.status(400).json({ error: `Path traversal in filename: ${filename}` });
+                    }
+                    const dirPath = path.dirname(filePath);
+                    if (!fs.existsSync(dirPath)) {
+                        fs.mkdirSync(dirPath, { recursive: true });
+                    }
                     fs.writeFileSync(filePath, fileContent);
                 }
             }

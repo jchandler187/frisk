@@ -64,7 +64,7 @@ def generate_report(skill_path, check_results):
 
     report = {
         "report_id": report_id,
-        "version": "2.0.0",
+        "schema_version": "2.0.0",
         "timestamp": now,
         "skill_path": skill_path,
         "verdict": verdict,

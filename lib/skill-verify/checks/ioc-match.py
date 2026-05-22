@@ -235,7 +235,7 @@ def load_malwarebazaar_hashes():
                 continue
             # SHA256 hash is column index 1 (first_seen_utc, sha256_hash, ...)
             if len(row) >= 2:
-                h = row[1].strip().lower()  # P0-3: CSV column, not regex
+                h = row[1].strip().strip("'").strip('"').lower()  # P0-3: CSV column, strip quotes
                 h = normalize(h)  # P0-6
                 if re.match(r'^[a-f0-9]{64}$', h):
                     hashes.add(h)
