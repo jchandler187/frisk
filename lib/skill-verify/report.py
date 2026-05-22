@@ -31,6 +31,17 @@ def generate_report(skill_path, check_results):
         if "error" in result and not result.get("findings"):
             continue
         for f in result.get("findings", []):
+            # P0-7: Escalate specific finding categories to critical severity
+            ftype = f.get("type", "")
+            category = f.get("category", "")
+            pattern = f.get("pattern", "")
+            escalate_categories = {"command_injection", "shell_injection", "path_traversal", "hardcoded_secret", "secret_in_code"}
+            if ftype in escalate_categories or category in escalate_categories:
+                f["severity"] = "critical"
+            # Also escalate os.system and shell injection patterns from Semgrep
+            if any(kw in pattern for kw in ["os.system", "shell=True", "execSync", "child_process.exec"]):
+                f["severity"] = "critical"
+            
             severity = f.get("severity", "low")
             if severity == "critical":
                 total_critical += 1

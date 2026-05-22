@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import csv
+import unicodedata
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -33,6 +34,64 @@ SAFE_DOMAINS = {
     "localhost", "127.0.0.1", "0.0.0.0",
 }
 
+
+def normalize(text):
+    """Apply Unicode NFKC normalization + confusable homoglyph stripping.
+
+    NFKC handles compatibility decompositions (fullwidth→ASCII, ligatures).
+    For homoglyphs (Cyrillic 'а' vs Latin 'a'), we use an explicit
+    confusable mapping from common Cyrillic/Macedonian/etc characters
+    to their Latin equivalents.
+    """
+    if not isinstance(text, str):
+        return text
+    text = unicodedata.normalize('NFKC', text)
+    # Strip common confusable homoglyphs (Cyrillic → Latin)
+    result = []
+    for ch in text:
+        result.append(CONFUSABLES.get(ch, ch))
+    return ''.join(result)
+
+
+# Common confusable character mapping (Cyrillic/Macedonian → Latin)
+# Not exhaustive but covers the most-likely homoglyph attacks
+CONFUSABLES = {
+    # Cyrillic lowercase → Latin
+    '\u0430': 'a',  # а → a
+    '\u0435': 'e',  # е → e
+    '\u043e': 'o',  # о → o
+    '\u0440': 'p',  # р → p
+    '\u0441': 'c',  # с → c
+    '\u0443': 'y',  # у → y
+    '\u0445': 'x',  # х → x
+    '\u044b': 'b',  # ы → b (approximate)
+    '\u0456': 'i',  # і → i (Ukrainian)
+    '\u0458': 'j',  # ј → j (Macedonian)
+    '\u0455': 's',  # ѕ → s (Macedonian)
+    '\u0457': 'i',  # ї → i (Ukrainian)
+    '\u0454': 'e',  # є → e (Ukrainian)
+    # Cyrillic uppercase → Latin uppercase
+    '\u0410': 'A',  # А → A
+    '\u0412': 'B',  # В → B
+    '\u0415': 'E',  # Е → E
+    '\u041a': 'K',  # К → K
+    '\u041c': 'M',  # М → M
+    '\u041d': 'H',  # Н → H
+    '\u041e': 'O',  # О → O
+    '\u0420': 'P',  # Р → P
+    '\u0421': 'C',  # С → C
+    '\u0422': 'T',  # Т → T
+    '\u0425': 'X',  # Х → X
+    # Greek confusables
+    '\u03b1': 'a',  # α → a
+    '\u03b9': 'i',  # ι → i
+    '\u03bf': 'o',  # ο → o
+    '\u03c1': 'p',  # ρ → p
+    '\u03c5': 'y',  # υ → y
+    '\u03c7': 'x',  # χ → x
+}
+
+
 def is_private_ip(ip):
     """Check if IP is in RFC 1918 or loopback/private ranges."""
     parts = ip.split('.')
@@ -53,6 +112,25 @@ def is_private_ip(ip):
     return False
 
 
+def check_intel_cache():
+    """Verify intel cache files exist and are readable for IOC matching.
+
+    Returns list of missing source names.
+    """
+    missing = []
+    if not os.path.isdir(INTEL_DIR):
+        return ["intel_cache_dir"]
+    if not os.path.exists(os.path.join(INTEL_DIR, "urlhaus", "urls.csv")):
+        missing.append("urlhaus")
+    if not os.path.exists(os.path.join(INTEL_DIR, "malwarebazaar", "recent_hashes.csv")):
+        missing.append("malwarebazaar")
+    if not os.path.exists(os.path.join(INTEL_DIR, "feodo", "c2_ips.csv")):
+        missing.append("feodo")
+    if not os.path.exists(os.path.join(INTEL_DIR, "threatfox")):
+        missing.append("threatfox")
+    return missing
+
+
 def extract_iocs(skill_path):
     """Extract IOCs from all files in skill directory."""
     iocs = {"urls": set(), "ips": set(), "domains": set(), "hashes": set()}
@@ -65,6 +143,7 @@ def extract_iocs(skill_path):
             continue
         try:
             content = fpath.read_text(errors='ignore')
+            content = normalize(content)  # P0-6: normalize before extraction
         except Exception:
             continue
 
@@ -108,46 +187,58 @@ def load_feodo_ips():
                 continue
             # IP is in column index 1 (dst_ip) for Feodo CSV format
             if len(row) >= 2:
-                ip = row[1].strip()
+                ip = normalize(row[1].strip())  # P0-6
             else:
-                ip = row[0].strip()
+                ip = normalize(row[0].strip())
             if re.match(IP_PATTERN.pattern, ip):
                 ips.add(ip)
     return ips
 
 def load_urlhaus_urls():
-    """Load URLhaus malicious URLs."""
+    """Load URLhaus malicious URLs using proper CSV parsing."""
     path = os.path.join(INTEL_DIR, "urlhaus", "urls.csv")
     urls = set()
     if not os.path.exists(path):
         return urls
     with open(path, errors='ignore') as f:
-        for line in f:
-            line = line.strip()
-            if line.startswith("#") or not line:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row:
                 continue
-            parts = line.split(",")
-            if len(parts) >= 3:
-                urls.add(parts[2].strip().lower())
+            # Skip comment lines (URLhaus starts with # headers)
+            if row[0].startswith("#"):
+                continue
+            # URL is in column index 2 (id, dateadded, url, ...)
+            if len(row) >= 3:
+                url = normalize(row[2].strip())  # P0-6: normalize at load
+                if url:
+                    urls.add(url.lower())
     return urls
 
 def load_malwarebazaar_hashes():
-    """Load MalwareBazaar SHA256 hashes."""
+    """Load MalwareBazaar SHA256 hashes using proper CSV parsing.
+
+    Column index 1 is sha256_hash. Uses csv.reader to handle
+    quoted fields with spaces and commas correctly (P0-3).
+    """
     path = os.path.join(INTEL_DIR, "malwarebazaar", "recent_hashes.csv")
     hashes = set()
     if not os.path.exists(path):
         return hashes
     with open(path, errors='ignore') as f:
-        for line in f:
-            line = line.strip()
+        reader = csv.reader(f)
+        for row in reader:
+            if not row:
+                continue
+            line = row[0].strip() if row else ''
             if line.startswith("#") or not line:
                 continue
-            parts = line.split(",")
-            for p in parts:
-                p = p.strip().lower()
-                if re.match(r'^[a-f0-9]{64}$', p):
-                    hashes.add(p)
-                    break
+            # SHA256 hash is column index 1 (first_seen_utc, sha256_hash, ...)
+            if len(row) >= 2:
+                h = row[1].strip().lower()  # P0-3: CSV column, not regex
+                h = normalize(h)  # P0-6
+                if re.match(r'^[a-f0-9]{64}$', h):
+                    hashes.add(h)
     return hashes
 
 def check_ioc_match(skill_path):
@@ -159,6 +250,19 @@ def check_ioc_match(skill_path):
         "errors": [],
         "extracted": {"urls": 0, "ips": 0, "domains": 0, "hashes": 0}
     }
+
+    # P0-4: Validate intel cache before proceeding
+    missing = check_intel_cache()
+    for source in missing:
+        results["findings"].append({
+            "category": "intel_missing",
+            "severity": "critical",
+            "description": f"Required intel source {source} is missing or corrupt. Results may be incomplete."
+        })
+    if not os.path.isdir(INTEL_DIR):
+        results["status"] = "fail"
+        results["errors"].append("intel cache directory missing")
+        return results
 
     iocs = extract_iocs(skill_path)
     results["extracted"] = {
@@ -197,7 +301,7 @@ def check_ioc_match(skill_path):
                     "value": url,
                     "source": "urlhaus",
                     "severity": "critical",
-                    "description": f"URL matches URLhaus malicious URL list"
+                    "description": "URL matches URLhaus malicious URL list"
                 })
                 break
 
@@ -212,9 +316,16 @@ def check_ioc_match(skill_path):
                 "description": "SHA256 hash matches MalwareBazaar sample"
             })
 
+    # Determine status — intel_missing findings upgrade severity
     if results["findings"]:
-        if any(f["severity"] == "critical" for f in results["findings"]):
+        has_critical = any(f["severity"] == "critical" and f.get("category") != "intel_missing" for f in results["findings"])
+        has_missing = any(f.get("category") == "intel_missing" for f in results["findings"])
+        if has_critical:
             results["status"] = "fail"
+        elif has_missing:
+            # Missing intel is critical but we still run with available data
+            # If no actual malicious findings, status is "warn" (incomplete results)
+            results["status"] = "warn"
         else:
             results["status"] = "warn"
 

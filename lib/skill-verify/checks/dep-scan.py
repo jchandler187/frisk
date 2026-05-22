@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from pathlib import Path
 from packaging.version import Version, InvalidVersion
 
@@ -158,6 +159,19 @@ def version_in_range(ver_str, ranges_list):
     return False
 
 
+def check_intel_cache():
+    """Verify intel cache directory and required sources exist."""
+    missing = []
+    if not os.path.isdir(INTEL_DIR):
+        return ["intel_cache_dir", "cisa_kev", "osv", "epss"]
+    if not os.path.exists(os.path.join(INTEL_DIR, "cisa-kev", "known_exploited_vulnerabilities.json")):
+        missing.append("cisa_kev")
+    if not os.path.isdir(os.path.join(INTEL_DIR, "osv")):
+        missing.append("osv")
+    if not os.path.exists(os.path.join(INTEL_DIR, "epss", "epss_scores-current.csv")):
+        missing.append("epss")
+    return missing
+
 def check_dependencies(skill_path):
     """Main check: match deps against OSV, flag KEV, rank by EPSS."""
     results = {
@@ -166,6 +180,19 @@ def check_dependencies(skill_path):
         "findings": [],
         "errors": []
     }
+
+    # Validate intel cache before proceeding
+    missing = check_intel_cache()
+    for source in missing:
+        results["findings"].append({
+            "category": "intel_missing",
+            "severity": "critical",
+            "description": f"Required intel source {source} is missing or corrupt. Results may be incomplete."
+        })
+    if not os.path.isdir(INTEL_DIR):
+        results["status"] = "fail"
+        results["errors"].append("intel cache directory missing")
+        return results
 
     deps = parse_skill_deps(skill_path)
     if not deps:
@@ -176,19 +203,21 @@ def check_dependencies(skill_path):
     kev = load_cisa_kev()
     epss = load_epss()
 
-    # Build OSV lookup by ecosystem
+    # Only load OSV ecosystems for which we found dependencies
+    # This prevents cross-matching (e.g., npm "requests" matching PyPI advisory)
+    ecosystems_found = set(d["ecosystem"] for d in deps if d["ecosystem"] in ("npm", "PyPI"))
     osv_advisories = {}
-    for eco in ["npm", "PyPI"]:
+    for eco in ecosystems_found:
         osv_advisories[eco] = load_osv_ecosystem(eco)
 
     for dep in deps:
         name = dep["name"]
         ecosystem = dep["ecosystem"]
 
-        # Check OSV for this ecosystem
+        # Only check OSV advisories from the same ecosystem
         if ecosystem in osv_advisories:
             for adv in osv_advisories[eco]:
-                if adv["package"].lower() != name.lower():
+                if unicodedata.normalize('NFKC', adv["package"].lower()) != unicodedata.normalize('NFKC', name.lower()):
                     continue
                 ver = dep.get("version", "").lstrip("^~>=<!")
                 if not ver:

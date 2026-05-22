@@ -25,6 +25,7 @@ usage() {
     echo "Options:"
     echo "  --json       Output report as JSON only"
     echo "  --checks=LIST  Run only specified checks (comma-separated)"
+    echo "  --strict     Fail if ANY intel source is missing (default: warn)"
     echo "  --help       Show this help"
     echo ""
     echo "Checks: dep-scan, static-analysis, secret-scan, yara-scan,"
@@ -35,11 +36,13 @@ usage() {
 skill_path=""
 json_only=0
 specific_checks=""
+strict_mode=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --json)    json_only=1; shift ;;
         --checks=*) specific_checks="${1#--checks=}"; shift ;;
+        --strict)  strict_mode=1; shift ;;
         --help|-h) usage ;;
         -*)        echo "Unknown option: $1" >&2; exit 1 ;;
         *)         skill_path="$1"; shift ;;
@@ -60,6 +63,74 @@ fi
 # Resolve to absolute path
 skill_path="$(cd "$(dirname "$skill_path")" 2>/dev/null && pwd)/$(basename "$skill_path")" || skill_path="$(realpath "$skill_path")"
 
+# P0-4: Validate intel cache before running any checks
+INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+MANIFEST_JSON="${INTEL_DIR}/manifest.json"
+intel_missing=0
+intel_errors=()
+strict_fail=0
+
+if [[ ! -d "$INTEL_DIR" ]]; then
+    intel_missing=1
+    intel_errors+=("Intel cache directory ${INTEL_DIR} does not exist")
+    strict_fail=1
+elif [[ ! -f "$MANIFEST_JSON" ]]; then
+    intel_missing=1
+    intel_errors+=("Intel manifest ${MANIFEST_JSON} missing — sync has never completed")
+    strict_fail=1
+else
+    # Check individual cache files that checks depend on
+    if [[ ! -f "${INTEL_DIR}/cisa-kev/known_exploited_vulnerabilities.json" ]]; then
+        intel_errors+=("CISA KEV cache missing")
+        ((strict_mode)) && strict_fail=1
+    fi
+    if [[ ! -d "${INTEL_DIR}/osv" ]]; then
+        intel_errors+=("OSV cache missing")
+        ((strict_mode)) && strict_fail=1
+    fi
+    if [[ ! -f "${INTEL_DIR}/urlhaus/urls.csv" ]]; then
+        intel_errors+=("URLhaus cache missing")
+        ((strict_mode)) && strict_fail=1
+    fi
+    if [[ ! -f "${INTEL_DIR}/malwarebazaar/recent_hashes.csv" ]]; then
+        intel_errors+=("MalwareBazaar cache missing")
+        ((strict_mode)) && strict_fail=1
+    fi
+    if [[ ! -f "${INTEL_DIR}/feodo/c2_ips.csv" ]]; then
+        intel_errors+=("Feodo cache missing")
+        ((strict_mode)) && strict_fail=1
+    fi
+fi
+
+if [[ $strict_fail -eq 1 ]]; then
+    if [[ $json_only -eq 0 ]]; then
+        echo -e "${RED}${BOLD}ERROR:${RESET} Intel cache is incomplete or missing."
+        for err in "${intel_errors[@]}"; do
+            echo -e "  ${CROSSMARK} ${err}"
+        done
+        echo "  Run: bash lib/intel-sync/sync.sh --all"
+        echo "  Or re-run without --strict to allow partial checks"
+    fi
+    # In strict mode with missing intel, abort with exit code 2 (fail)
+    exit 2
+fi
+
+# In non-strict mode, warn but continue
+if [[ ${#intel_errors[@]} -gt 0 ]] && [[ $json_only -eq 0 ]]; then
+    echo -e "${YELLOW}${BOLD}WARNING:${RESET} Some intel sources are missing:"
+    for err in "${intel_errors[@]}"; do
+        echo -e "  ${WARNMARK} ${err}"
+    done
+    echo "  Results may be incomplete. Run: bash lib/intel-sync/sync.sh --all"
+    echo ""
+fi
+
+# If intel cache directory doesn't exist at all, override verdict to "fail"
+cache_completely_missing=0
+if [[ ! -d "$INTEL_DIR" ]]; then
+    cache_completely_missing=1
+fi
+
 ALL_CHECKS=(dep-scan static-analysis secret-scan yara-scan ioc-match behavioral prompt-inject)
 if [[ -n "$specific_checks" ]]; then
     IFS=',' read -ra CHECKS <<< "$specific_checks"
@@ -74,6 +145,9 @@ if [[ $json_only -eq 0 ]]; then
     echo ""
     echo -e "  Target: ${CYAN}${skill_path}${RESET}"
     echo -e "  Checks: ${BOLD}${#CHECKS[@]}${RESET} of ${#ALL_CHECKS[@]}"
+    if [[ ${#intel_errors[@]} -gt 0 ]]; then
+        echo -e "  ${WARNMARK} ${YELLOW}${#intel_errors[@]} intel source(s) missing${RESET}"
+    fi
     echo ""
 fi
 
@@ -90,31 +164,31 @@ for check in "${CHECKS[@]}"; do
     case "$check" in
         dep-scan)
             result=$(python3 "${CHECKS_DIR}/dep-scan.py" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"dep-scan\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"dep-scan","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         static-analysis)
             result=$(bash "${CHECKS_DIR}/static-analysis.sh" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"static_analysis\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"static_analysis","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         secret-scan)
             result=$(bash "${CHECKS_DIR}/secret-scan.sh" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"secret_scan\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"secret_scan","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         yara-scan)
             result=$(bash "${CHECKS_DIR}/yara-scan.sh" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"yara_scan\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"yara_scan","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         ioc-match)
             result=$(python3 "${CHECKS_DIR}/ioc-match.py" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"ioc_match\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"ioc_match","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         behavioral)
             result=$(python3 "${CHECKS_DIR}/behavioral.py" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"behavioral_heuristics\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"behavioral_heuristics","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         prompt-inject)
             result=$(python3 "${CHECKS_DIR}/prompt-inject.py" "$skill_path" 2>/dev/null || \
-                echo "{\"check\":\"prompt_injection\",\"status\":\"pass\",\"findings\":[],\"errors\":[\"check failed\"]}")
+                echo '{"check":"prompt_injection","status":"pass","findings":[],"errors":["check failed"]}')
             ;;
         *)
             if [[ $json_only -eq 0 ]]; then
@@ -176,6 +250,12 @@ fi
 
 verdict=$(echo "$report_json" | jq -r '.verdict')
 
+# P0-4: If intel cache was completely missing, override verdict to "fail"
+if [[ $cache_completely_missing -eq 1 ]]; then
+    verdict="fail"
+    report_json=$(echo "$report_json" | jq --arg v "fail" '.verdict = $v')
+fi
+
 if [[ $json_only -eq 0 ]]; then
     echo ""
     total=$(echo "$report_json" | jq '.summary.total_findings // 0')
@@ -189,6 +269,9 @@ if [[ $json_only -eq 0 ]]; then
     echo -e "  Time:     $((elapsed_ms / 1000)).$((elapsed_ms % 1000))s"
     report_id=$(echo "$report_json" | jq -r '.report_id // "unknown"')
     echo -e "  Report:   ${report_id}"
+    if [[ ${#intel_errors[@]} -gt 0 ]]; then
+        echo -e "  ${WARNMARK} ${YELLOW}Intel sources missing — results may be incomplete${RESET}"
+    fi
     echo ""
 fi
 

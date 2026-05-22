@@ -42,15 +42,27 @@ if jq empty "$tmpout" 2>/dev/null; then
             line: .start.line
         }]' "$tmpout")
         
-        crit=$(echo "$findings" | jq '[.[] | select(.severity == "ERROR")] | length')
-        warn=$(echo "$findings" | jq '[.[] | select(.severity == "WARNING")] | length')
+        # P0-7: Escalate injection/traversal/secret findings to critical
+        results=$(echo "$results" | jq '
+            .findings = [.findings[] |
+                if .rule_id | test("command.injection|shell.injection|os.system|path.traversal|hardcoded.secret|secret.in.code|insecure-exec").+ then
+                    .severity = "ERROR"
+                elif .rule_id | test("sql.injection|xss|csrf|cors").+ then
+                    .severity = "WARNING"
+                else . end
+            ]
+        ')
+        
+        # Recount critical/warning after escalation
+        crit=$(echo "$results" | jq '[.findings[] | select(.severity == "ERROR")] | length')
+        warn=$(echo "$results" | jq '[.findings[] | select(.severity == "WARNING")] | length')
         
         if [[ "$crit" -gt 0 ]]; then status="fail"
         elif [[ "$warn" -gt 0 ]]; then status="warn"
         else status="pass"; fi
         
-        results=$(jq -n --argjson findings "$findings" --arg status "$status" --arg count "$count" \
-            '{check:"static_analysis",status:$status,findings:$findings,errors:[],total:$count}')
+        results=$(echo "$results" | jq --arg status "$status" --arg count "$count" \
+            '{check:"static_analysis",status:$status,findings:.findings,errors:[],total:$count}')
     fi
 else
     results='{"check":"static_analysis","status":"pass","findings":[],"errors":["semgrep output parse error"]}'

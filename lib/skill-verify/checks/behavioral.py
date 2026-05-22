@@ -14,6 +14,7 @@ import os
 import re
 import base64
 import sys
+import unicodedata
 from pathlib import Path
 
 DANGEROUS_SHELL_PATTERNS = [
@@ -34,6 +35,26 @@ SYSTEM_WRITE_PATTERNS = [
      "Node.js write to system path"),
     (r'mkdir\s*\([^)]*[\'"]/(etc|usr|var|srv)/', "mkdir on system path"),
     (r'os\.makedirs\s*\([^)]*[\'"]/(etc|usr|var|srv)/', "os.makedirs on system path"),
+]
+
+PATH_TRAVERSAL_PATTERNS = [
+    (r'\.\.\/+(etc|var|usr|home|root|srv|tmp|boot)\b',
+     "Path traversal attempt: resolves outside workspace"),
+    (r'\.\.\\+(etc|var|usr|home|root|srv|tmp|boot)\b',
+     "Path traversal attempt (backslash): resolves outside workspace"),
+    (r'\.\./\.\./',
+     "Nested path traversal: relative path escapes workspace"),
+    (r'\.\.\\\\',
+     "Nested path traversal (backslash): relative path escapes workspace"),
+]
+
+PATH_ABSOLUTE_FORBIDDEN = [
+    (r'["\']/(etc|var|usr(?!/local))/',
+     "Absolute system path access outside workspace"),
+    (r'["\']/root/',
+     "Absolute path to /root — should not access root home"),
+    (r'["\']/home/(?!openclaw/)',
+     "Absolute path to another user's home directory"),
 ]
 
 FETCH_EXEC_PATTERNS = [
@@ -109,6 +130,7 @@ def check_behavioral(skill_path):
             continue
         try:
             content = fpath.read_text(errors='ignore')
+            content = unicodedata.normalize('NFKC', content)  # P0-6: normalize homoglyphs
             all_code += content + "\n"
             code_files.append((fpath, content))
         except Exception:
@@ -150,11 +172,30 @@ def check_behavioral(skill_path):
                 "severity": "critical"
             })
 
-    # 4. Large base64 payloads
+    # 4. Path traversal detection (P0-5)
+    normalized_code = all_code.replace('\\'  + '\\', '/')  # normalize backslash paths
+    for pattern, desc in PATH_TRAVERSAL_PATTERNS:
+        if re.search(pattern, all_code):
+            results["findings"].append({
+                "type": "path_traversal",
+                "pattern": pattern,
+                "description": desc,
+                "severity": "critical"
+            })
+    for pattern, desc in PATH_ABSOLUTE_FORBIDDEN:
+        if re.search(pattern, all_code):
+            results["findings"].append({
+                "type": "path_traversal",
+                "pattern": pattern,
+                "description": desc,
+                "severity": "critical"
+            })
+
+    # 5. Large base64 payloads
     b64_findings = find_base64_payloads(all_code)
     results["findings"].extend(b64_findings)
 
-    # 5. Capability overreach
+    # 6. Capability overreach
     declared = check_capabilities_declared(skill_path)
     if declared:
         for cap, patterns in CAPABILITY_PATTERNS.items():
@@ -168,6 +209,25 @@ def check_behavioral(skill_path):
                             "severity": "medium"
                         })
                         break
+
+    # P0-7: Severity escalation — certain categories MUST be critical
+    ESCALATE_TO_CRITICAL = {"command_injection", "shell_injection", "path_traversal", "hardcoded_secret", "secret_in_code"}
+    SHELL_INJ_KEYWORDS = ["os.system", "shell=True", "execSync", "child_process.exec", "os.system()", "subprocess.*shell"]
+    for f in results["findings"]:
+        ftype = f.get("type", "")
+        category = f.get("category", "")
+        pattern = f.get("pattern", "")
+        desc = f.get("description", "")
+        if ftype in ESCALATE_TO_CRITICAL or category in ESCALATE_TO_CRITICAL:
+            f["severity"] = "critical"
+        # Also escalate dangerous_shell/shell injection findings to critical
+        if ftype == "dangerous_shell":
+            f["severity"] = "critical"
+        # Escalate any pattern containing shell injection keywords
+        for kw in SHELL_INJ_KEYWORDS:
+            if kw in pattern or kw in desc:
+                f["severity"] = "critical"
+                break
 
     # Determine status
     if any(f["severity"] == "critical" for f in results["findings"]):
