@@ -15,7 +15,7 @@ URLHAUS_INNER_FILE="csv.txt"
 
 log_info "Syncing URLhaus..."
 mkdir -p "${INTEL_DIR}/urlhaus"
-zip_tmp=$(mktemp "/tmp/urlhaus.XXXXXX.zip")
+zip_tmp=$(mktemp "${TMPDIR:-/tmp}/urlhaus.XXXXXX.zip")
 if curl -fsSL --max-time 120 --retry 3 --retry-delay 5 "$URL" -o "$zip_tmp"; then
     csv_tmp=$(mktemp "${TARGET}.XXXXXX.new")
     if unzip -p "$zip_tmp" "$URLHAUS_INNER_FILE" > "$csv_tmp" 2>/dev/null; then

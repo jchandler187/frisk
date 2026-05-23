@@ -10,7 +10,7 @@
 #
 set -euo pipefail
 
-VERSION="2.4.0"
+VERSION="2.4.1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHECKS_DIR="${SCRIPT_DIR}/checks"
 
@@ -290,7 +290,7 @@ if [[ -z "$report_json" ]]; then
         --arg verdict "$verdict" \
         --arg path "$skill_path" \
         --argjson duration "$elapsed_ms" \
-        '{schema_version:"2.3.0",version:"2.3.0",verdict:$verdict,skill_path:$path,checks:.,scan_duration_ms:$duration}')
+        '{schema_version:"2.0.0",version:"2.4.1",verdict:$verdict,skill_path:$path,checks:.,scan_duration_ms:$duration}')
 fi
 
 verdict=$(echo "$report_json" | jq -r '.verdict')

@@ -1,6 +1,6 @@
 {
   "name": "@lowwattlabs/clawsec",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "ClawSec - Security Verification for ClawHub Skills",
   "bin": {
     "clawsec": "./bin/clawsec.js",

@@ -14,7 +14,7 @@ MANIFEST_PY="$(dirname "$0")/../manifest.py"
 
 log_info "Syncing EPSS..."
 
-gz_tmp=$(mktemp "/tmp/epss.XXXXXX.csv.gz")
+gz_tmp=$(mktemp "${TMPDIR:-/tmp}/epss.XXXXXX.csv.gz")
 if curl -fsSL --max-time 120 --retry 3 --retry-delay 5 "$URL" -o "$gz_tmp"; then
     csv_tmp=$(mktemp "${TARGET}.XXXXXX.new")
     if gunzip -c "$gz_tmp" > "$csv_tmp"; then

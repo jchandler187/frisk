@@ -17,7 +17,7 @@ REPORTS_DIR = os.path.join(CLAWSEC_HOME, "reports")
 
 def generate_report(skill_path, check_results):
     """Generate a final report from all check results."""
-    report_id = str(uuid.uuid4())[:8]
+    report_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
 
     # Aggregate findings

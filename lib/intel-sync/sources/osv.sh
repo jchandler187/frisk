@@ -27,10 +27,10 @@ for eco in "${ECOSYSTEMS[@]}"; do
     mkdir -p "$eco_dir"
 
     zip_url="${URL_BASE}/${eco}/all.zip"
-    zip_tmp=$(mktemp "/tmp/osv-${eco}.XXXXXX.zip")
+    zip_tmp=$(mktemp "${TMPDIR:-/tmp}/osv-${eco}.XXXXXX.zip")
 
     if curl -fsSL --max-time 300 --retry 3 --retry-delay 5 "$zip_url" -o "$zip_tmp"; then
-        extract_tmp=$(mktemp -d "/tmp/osv-${eco}-extract.XXXXXX")
+        extract_tmp=$(mktemp -d "${TMPDIR:-/tmp}/osv-${eco}-extract.XXXXXX")
         if unzip -q -o "$zip_tmp" -d "$extract_tmp" 2>/dev/null; then
             # Clean old JSON files and broken symlinks before replacing
             find "$eco_dir" -maxdepth 1 -name '*.json' -delete 2>/dev/null || true
