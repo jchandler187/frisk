@@ -86,12 +86,16 @@ def find_base64_payloads(content, threshold=2048):
             # Check if it's binary-ish (non-printable content)
             non_printable = sum(1 for b in decoded if b < 32 and b not in (9, 10, 13))
             if non_printable > len(decoded) * 0.1:
+                # ELF binaries embedded as base64 are critical — they're trojan horses
+                is_elf = decoded[:4] == b'ELF' or decoded[:4] == b'ELF'
+                severity = "critical" if is_elf else "high"
+                desc = f"Embedded ELF binary ({len(decoded)} bytes)" if is_elf else f"Large base64 payload ({len(decoded)} bytes decoded, appears binary)"
                 findings.append({
-                    "type": "large_base64_payload",
+                    "type": "embedded_elf_binary" if is_elf else "large_base64_payload",
                     "size_bytes": len(decoded),
                     "encoded_size": len(b64_str),
-                    "severity": "high",
-                    "description": f"Large base64 payload ({len(decoded)} bytes decoded, appears binary)"
+                    "severity": severity,
+                    "description": desc
                 })
         except Exception:
             pass

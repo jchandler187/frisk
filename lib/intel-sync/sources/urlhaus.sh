@@ -20,7 +20,14 @@ if curl -fsSL --max-time 120 --retry 3 --retry-delay 5 "$URL" -o "$zip_tmp"; the
     csv_tmp=$(mktemp "${TARGET}.XXXXXX.new")
     if unzip -p "$zip_tmp" "$URLHAUS_INNER_FILE" > "$csv_tmp" 2>/dev/null; then
         count=$(($(wc -l < "$csv_tmp") - 1))  # minus header
-        mv -f "$csv_tmp" "$TARGET"
+        # Validate extracted CSV is text, not raw ZIP
+        if file "$csv_tmp" | grep -qi "zip\|archive"; then
+            rm -f "$csv_tmp"
+            python3 "$MANIFEST_PY" update urlhaus 0 failed "extracted file is still a ZIP"
+            echo -e "${CROSSMARK} URLhaus: extracted file is still a ZIP (sync may have failed)"
+        else
+            mv -f "$csv_tmp" "$TARGET"
+        fi
         python3 "$MANIFEST_PY" update urlhaus "$count" success
         echo -e "${CHECKMARK} URLhaus: ${count} malicious URLs"
     else

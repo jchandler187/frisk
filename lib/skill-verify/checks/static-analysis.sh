@@ -12,12 +12,12 @@ skill_path="${1:?Usage: static-analysis.sh <skill_path>}"
 results='{"check":"static_analysis","status":"pass","findings":[],"errors":[]}'
 
 if ! command -v semgrep &>/dev/null; then
-    echo '{"check":"static_analysis","status":"pass","findings":[],"errors":["semgrep not installed — skipping"]}'
+    echo '{"check":"static_analysis","status":"warn","findings":[],"errors":["semgrep not installed — results may be incomplete"]}'
     exit 0
 fi
 
 if [[ ! -d "$SEMRULES_DIR" ]]; then
-    echo '{"check":"static_analysis","status":"pass","findings":[],"errors":["semgrep rules not synced — skipping"]}'
+    echo '{"check":"static_analysis","status":"warn","findings":[],"errors":["semgrep rules not synced — results may be incomplete"]}'
     exit 0
 fi
 
@@ -66,7 +66,7 @@ if jq empty "$tmpout" 2>/dev/null; then
             '{check:"static_analysis",status:$status,findings:.findings,errors:[],total:$count}')
     fi
 else
-    results='{"check":"static_analysis","status":"pass","findings":[],"errors":["semgrep output parse error"]}'
+    results='{"check":"static_analysis","status":"warn","findings":[],"errors":["semgrep output parse error — results may be incomplete"]}'
 fi
 
 rm -f "$tmpout"
