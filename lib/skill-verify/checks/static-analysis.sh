@@ -1,5 +1,11 @@
 # ⚡ Low Watt Labs — ClawSec
 # ClawSec v2 - Static Analysis (Semgrep)
+#
+# SECURITY MANIFEST:
+# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config.sh)
+# External endpoints called: none
+# Local files read: skill_path (target directory), semgrep rules from intel cache
+# Local files written: /tmp/semgrep.XXXXXX.json (temporary, deleted after scan)
 set -euo pipefail
 
 source "$(dirname "$0")/../../common/config.sh"
@@ -21,7 +27,7 @@ if [[ ! -d "$SEMRULES_DIR" ]]; then
     exit 0
 fi
 
-tmpout=$(mktemp /tmp/semgrep.XXXXXX.json)
+tmpout=$(mktemp "${TMPDIR:-/tmp}/semgrep.XXXXXX.json")
 
 # Use --config auto for speed (community rules, pre-bundled)
 timeout 30 semgrep --config auto \
@@ -42,12 +48,13 @@ if jq empty "$tmpout" 2>/dev/null; then
             line: .start.line
         }]' "$tmpout")
         
-        # P0-7: Escalate injection/traversal/secret findings to critical
+        # Escalate injection/traversal/secret findings to critical
+        results=$(echo "$results" | jq --argjson findings "$findings" '.findings = $findings')
         results=$(echo "$results" | jq '
             .findings = [.findings[] |
-                if .rule_id | test("command.injection|shell.injection|os.system|path.traversal|hardcoded.secret|secret.in.code|insecure-exec").+ then
+                if .rule_id | test("command.injection|shell.injection|os.system|path.traversal|hardcoded.secret|secret.in.code|insecure-exec") then
                     .severity = "ERROR"
-                elif .rule_id | test("sql.injection|xss|csrf|cors").+ then
+                elif .rule_id | test("sql.injection|xss|csrf|cors") then
                     .severity = "WARNING"
                 else . end
             ]

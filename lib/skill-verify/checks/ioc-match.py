@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # ⚡ Low Watt Labs
+# SECURITY MANIFEST:
+# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config imports)
+# External endpoints called: none (all intel is local)
+# Local files read: skill_path (target directory), intel cache
+# Local files written: none
 """ClawSec v2 - IOC Extraction & Match
 
 Extracts URLs, IPs, domains, hashes from skill code and matches against

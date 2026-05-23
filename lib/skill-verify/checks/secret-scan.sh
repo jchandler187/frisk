@@ -1,5 +1,11 @@
 # ⚡ Low Watt Labs — ClawSec
 # ClawSec v2 - Secret Scan (Gitleaks)
+#
+# SECURITY MANIFEST:
+# Environment variables accessed: CLAWSEC_HOME (via colors.sh, optional)
+# External endpoints called: none
+# Local files read: skill_path (target directory being scanned)
+# Local files written: /tmp/gitleaks.XXXXXX.json (temporary, deleted after scan)
 set -euo pipefail
 
 source "$(dirname "$0")/../../common/colors.sh"
@@ -13,7 +19,7 @@ if ! command -v gitleaks &>/dev/null; then
 fi
 
 # Run gitleaks on the skill directory
-tmpout=$(mktemp /tmp/gitleaks.XXXXXX.json)
+tmpout=$(mktemp "${TMPDIR:-/tmp}/gitleaks.XXXXXX.json")
 
 # gitleaks detect with no-git flag for untracked dirs
 gitleaks detect --source "$skill_path" --no-git --report-format json --report-path "$tmpout" 2>/dev/null || true

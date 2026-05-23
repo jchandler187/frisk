@@ -1,6 +1,13 @@
 # ⚡ Low Watt Labs — ClawSec Skill Verify Orchestrator
 # ClawSec v2 - Skill Verify Orchestrator
 # Runs all 7 security checks against a skill, produces JSON report
+#
+# SECURITY MANIFEST:
+# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR, CLAWSEC_REPORTS_DIR (via config.sh)
+# External endpoints called: none
+# Local files read: skill_path (target directory)
+# Local files written: TMPDIR/clawsec-results.XXXXXX.json (temporary, deleted after scan)
+#
 set -euo pipefail
 
 VERSION="2.3.1"

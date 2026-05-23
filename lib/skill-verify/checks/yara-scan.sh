@@ -1,5 +1,11 @@
 # ⚡ Low Watt Labs — ClawSec
 # ClawSec v2 - YARA Scan
+#
+# SECURITY MANIFEST:
+# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config.sh)
+# External endpoints called: none
+# Local files read: skill_path (target directory), YARA rules from intel cache
+# Local files written: /tmp/yara-compiled.XXXXXX, /tmp/yara-combined.XXXXXX.yar, /tmp/yara-scan.XXXXXX (all temporary, deleted after scan)
 set -euo pipefail
 
 source "$(dirname "$0")/../../common/config.sh"
@@ -31,19 +37,19 @@ done < <(find "$YARA_RULES_DIR" -name '*.yar' -o -name '*.yara' 2>/dev/null | so
 
 # If we have good rules, build a compiled ruleset and scan
 if [[ ${#good_rules[@]} -gt 0 ]]; then
-    compiled_rules=$(mktemp /tmp/yara-compiled.XXXXXX)
+    compiled_rules=$(mktemp "${TMPDIR:-/tmp}/yara-compiled.XXXXXX")
     # Build combined rule file for yarac
-    combined_rules=$(mktemp /tmp/yara-combined.XXXXXX.yar)
+    combined_rules=$(mktemp "${TMPDIR:-/tmp}/yara-combined.XXXXXX.yar")
     for rulefile in "${good_rules[@]}"; do
         echo "include \"${rulefile}\"" >> "$combined_rules"
     done
     if yarac "$combined_rules" "$compiled_rules" 2>/dev/null; then
         # Scan with compiled rules for performance
-        tmpout=$(mktemp /tmp/yara-scan.XXXXXX)
+        tmpout=$(mktemp "${TMPDIR:-/tmp}/yara-scan.XXXXXX")
         yara -r -C "$compiled_rules" "$skill_path" >> "$tmpout" 2>/dev/null || true
     else
         # Fallback: scan with source rules individually
-        tmpout=$(mktemp /tmp/yara-scan.XXXXXX)
+        tmpout=$(mktemp "${TMPDIR:-/tmp}/yara-scan.XXXXXX")
         for rulefile in "${good_rules[@]}"; do
             yara -r "$rulefile" "$skill_path" >> "$tmpout" 2>/dev/null || true
         done
