@@ -27,6 +27,34 @@ function sanitizeSlug(slug) {
     return slug;
 }
 
+// Strip execute permissions from all files in a directory tree.
+// Security: downloaded skills are READ ONLY during scanning — never executed.
+function hardenSkillDir(dir) {
+    try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isDirectory()) {
+                hardenSkillDir(fullPath);
+            } else {
+                try {
+                    const mode = fs.statSync(fullPath).mode;
+                    // Remove all execute bits (user, group, other)
+                    fs.chmodSync(fullPath, mode & ~0o111);
+                } catch {}
+            }
+        }
+    } catch {}
+}
+
+// Create a restricted temp directory for skill downloads.
+// Returns the path to the temp dir.
+function createScanTempDir() {
+    const tmpDir = path.join(os.tmpdir(), 'clawsec-scan-' + uuidv4().slice(0, 8));
+    fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
+    return tmpDir;
+}
+
 router.post('/scan', (req, res) => {
     const { slug, content, path: reqPath } = req.body;
 
@@ -44,42 +72,50 @@ router.post('/scan', (req, res) => {
         if (reqPath && fs.existsSync(reqPath)) {
             targetDir = reqPath;
         } else if (slug) {
-            // P1-4: Validate slug before passing to clawhub install
+            // Validate slug before passing to clawhub install
             const safeSlug = sanitizeSlug(slug);
             if (!safeSlug) {
                 return res.status(400).json({ error: 'Invalid slug: must be alphanumeric with hyphens/underscores, max 128 chars' });
             }
-            // Try to install from ClawHub
-            const tmpDir = '/tmp/clawsec-scan-' + uuidv4().slice(0, 8);
+            // Download from ClawHub into restricted temp directory
+            const tmpDir = createScanTempDir();
             try {
-                execFileSync('clawhub', ['install', safeSlug, '--dir', tmpDir], {
-                    timeout: 60000, encoding: 'utf8'
+                // SECURITY: suppress npm postinstall scripts from the downloaded skill
+                execFileSync('clawhub', ['install', safeSlug, '--dir', tmpDir, '--no-input'], {
+                    timeout: 60000,
+                    encoding: 'utf8',
+                    env: { ...process.env, npm_config_ignore_scripts: 'true' }
                 });
-                // Find the installed skill
+                // Find the installed skill directory
                 const dirs = fs.readdirSync(tmpDir);
                 if (dirs.length > 0) {
                     targetDir = path.join(tmpDir, dirs[0]);
-                    cleanup = true;
                 }
+                // SECURITY: strip execute permissions from all downloaded files
+                if (targetDir) {
+                    hardenSkillDir(targetDir);
+                }
+                cleanup = true;
             } catch (e) {
+                // Clean up on failure
+                try { fs.rmSync(tmpDir, { recursive: true }); } catch {}
                 return res.status(404).json({ error: 'Skill not found: ' + slug });
             }
         } else if (content) {
             // Write content to temp dir
-            const tmpDir = '/tmp/clawsec-scan-' + uuidv4().slice(0, 8);
-            fs.mkdirSync(tmpDir, { recursive: true });
+            const tmpDir = createScanTempDir();
 
             if (typeof content === 'string') {
                 fs.writeFileSync(path.join(tmpDir, 'SKILL.md'), content);
             } else if (typeof content === 'object') {
                 // Object with file contents
                 for (const [filename, fileContent] of Object.entries(content)) {
-                    // P0: Sanitize filename against path traversal
+                    // Sanitize filename against path traversal
                     const safeName = path.basename(filename).replace(/\.\./g, '');
                     if (safeName !== filename || filename.includes('..')) {
                         return res.status(400).json({ error: 'Invalid filename: ' + filename });
                     }
-                    // P0: Ensure resolved path stays within tmpDir
+                    // Ensure resolved path stays within tmpDir
                     const filePath = path.resolve(tmpDir, filename);
                     if (!filePath.startsWith(path.resolve(tmpDir) + path.sep)) {
                         return res.status(400).json({ error: 'Path traversal in filename: ' + filename });
@@ -136,8 +172,13 @@ router.post('/scan', (req, res) => {
         res.json({ report_id: reportId, ...result });
 
     } finally {
-        if (cleanup && targetDir && targetDir.startsWith('/tmp/clawsec-scan-')) {
+        if (cleanup && targetDir) {
             try { fs.rmSync(targetDir, { recursive: true }); } catch {}
+            // Also try cleaning parent if it's a scan temp dir
+            const parentDir = path.dirname(targetDir);
+            if (parentDir.includes('clawsec-scan-')) {
+                try { fs.rmSync(parentDir, { recursive: true }); } catch {}
+            }
         }
     }
 });

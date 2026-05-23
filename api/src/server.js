@@ -39,7 +39,7 @@ app.use('/api/v1', routes);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', version: '2.0.0', uptime: process.uptime() });
+    res.json({ status: 'ok', version: '2.3.1', uptime: process.uptime() });
 });
 
 // Error handler
@@ -53,6 +53,6 @@ app.use((err, req, res, next) => {
 
 // Start
 app.listen(PORT, '0.0.0.0', () => {
-    console.log("⚡ ClawSec API v2.0.0 listening on 0.0.0.0:" + PORT);
+    console.log("⚡ ClawSec API v2.3.1 listening on 0.0.0.0:" + PORT);
     fs.mkdirSync(REPORTS_DIR, { recursive: true });
 });

@@ -1,6 +1,6 @@
 {
   "name": "@lowwattlabs/clawsec",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "ClawSec - Security Verification for ClawHub Skills",
   "bin": {
     "clawsec": "./bin/clawsec.js",
@@ -11,8 +11,7 @@
     "cli/",
     "lib/",
     "api/",
-    "requirements.txt",
-    "setup.sh"
+    "requirements.txt"
   ],
   "scripts": {
     "start": "node api/src/server.js",

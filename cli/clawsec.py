@@ -22,7 +22,7 @@ import tempfile
 import time
 from pathlib import Path
 
-VERSION = "2.3.0"
+VERSION = "2.3.1"
 CLAWSEC_DIR = os.environ.get("CLAWSEC_HOME", os.path.expanduser("~/.clawsec"))
 INTEL_DIR = os.environ.get("CLAWSEC_INTEL_DIR", os.path.join(CLAWSEC_DIR, "intel"))
 REPORTS_DIR = os.environ.get("CLAWSEC_REPORTS_DIR", os.path.join(CLAWSEC_DIR, "reports"))
@@ -129,7 +129,7 @@ def download_slug(slug):
         return skill_path, tmpdir
 
     except FileNotFoundError:
-        print(f"{R}Error:{RESET} 'clawhub' CLI not found. Install it with: npm install -g @anthropic/clawhub", file=sys.stderr)
+        print(f"{R}Error:{RESET} 'clawhub' CLI not found. Install it with: npm install -g clawhub", file=sys.stderr)
         shutil.rmtree(tmpdir, ignore_errors=True)
         return None
     except subprocess.TimeoutExpired:

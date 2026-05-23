@@ -3,7 +3,7 @@
 # Runs all 7 security checks against a skill, produces JSON report
 set -euo pipefail
 
-VERSION="2.0.0"
+VERSION="2.3.1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CHECKS_DIR="${SCRIPT_DIR}/checks"
 
@@ -260,7 +260,8 @@ end_time=$(date +%s%N)
 elapsed_ms=$(( (end_time - start_time) / 1000000 ))
 
 # Generate report via safe temp file approach
-results_tmpfile=$(mktemp /tmp/clawsec-results.XXXXXX.json)
+results_tmpfile=$(mktemp ${TMPDIR:-/tmp}/clawsec-results.XXXXXX.json)
+trap "rm -f $results_tmpfile" EXIT INT TERM
 echo "$check_results" > "$results_tmpfile"
 
 report_json=$(python3 -c "
@@ -282,7 +283,7 @@ if [[ -z "$report_json" ]]; then
         --arg verdict "$verdict" \
         --arg path "$skill_path" \
         --argjson duration "$elapsed_ms" \
-        '{schema_version:"2.0.0",version:"2.0.0",verdict:$verdict,skill_path:$path,checks:.,scan_duration_ms:$duration}')
+        '{schema_version:"2.3.0",version:"2.3.0",verdict:$verdict,skill_path:$path,checks:.,scan_duration_ms:$duration}')
 fi
 
 verdict=$(echo "$report_json" | jq -r '.verdict')
