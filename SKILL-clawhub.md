@@ -1,7 +1,7 @@
 ---
 name: clawsec
 description: "Scan ClawHub skills for security vulnerabilities before installing — 9 threat intel sources, 7 autonomous checks, instant slug scan."
-version: 2.3.1
+version: 2.3.3
 metadata:
   openclaw:
     emoji: "⚡"
@@ -20,13 +20,13 @@ metadata:
     envVars:
       - name: CLAWSEC_HOME
         required: false
-        description: Base directory for intel cache and reports (default: ~/.clawsec)
+        description: "Base directory for intel cache and reports (default: ~/.clawsec)"
       - name: CLAWSEC_INTEL_DIR
         required: false
-        description: Override intel cache directory (default: CLAWSEC_HOME/intel)
+        description: "Override intel cache directory (default: CLAWSEC_HOME/intel)"
       - name: CLAWSEC_REPORTS_DIR
         required: false
-        description: Override reports directory (default: CLAWSEC_HOME/reports)
+        description: "Override reports directory (default: CLAWSEC_HOME/reports)"
     install:
       - kind: node
         package: "@lowwattlabs/clawsec"
