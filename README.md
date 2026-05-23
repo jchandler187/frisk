@@ -1,6 +1,8 @@
-# ⚡ ClawSec v2
+# ⚡ ClawSec
 
-Professional security verification tool that scans ClawHub skills against 10 continuously-updated threat intelligence sources using 7 autonomous security checks.
+Security verification tool that scans ClawHub skills against 10 continuously-updated threat intelligence sources using 7 autonomous security checks.
+
+If you find it useful, [buy me a coffee](https://buymeacoffee.com/jchandler187) ⚡
 
 ## Quick Start
 
@@ -108,23 +110,6 @@ curl http://localhost:3100/api/v1/status
 curl http://localhost:3100/health
 ```
 
-## API Reference
-
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/v1/scan` | Submit skill for verification | API key (Pro) |
-| GET | `/api/v1/report/{id}` | Retrieve a saved report | No |
-| GET | `/api/v1/badge/{id}.svg` | Trust badge SVG | No |
-| GET | `/api/v1/status` | Intel cache status | No |
-| GET | `/health` | Health check | No |
-
-**Rate limits:** 5 scans/day (free), 1,000/day (Pro with API key)
-
-## Pricing
-
-- **CLI**: Free and open source. Scan any local skill directory.
-- **Pro API**: $9/month — 1,000 scans/day, API key auth, priority queue. Email team@lowwattlabs.com for API keys.
-
 ## Security Checks (7)
 
 1. **Dependency Scan** — Matches declared dependencies against OSV, flags CISA KEV as critical, ranks by EPSS probability
@@ -162,7 +147,7 @@ ClawSec uses environment variables with sensible defaults:
 | `CLAWSEC_REPORTS_DIR` | `~/.clawsec/reports` | Reports directory |
 | `CLAWSEC_PORT` | `3100` | API server port |
 
-## Setup (for local development)
+## Local Development
 
 ```bash
 git clone https://github.com/jchandler187/clawsec.git
@@ -226,12 +211,6 @@ clawsec/
 - Transitive vulnerabilities
 - Novel/zero-day threats not in any feed
 
-## Threat Model
-
-**In scope:** ClawSec analyzes skill source code and configuration against known threat indicators. The assumed attacker can embed malicious code, declare vulnerable dependencies, include IOCs, use obfuscation, attempt prompt injection, or hide secrets.
-
-**Out of scope:** Dynamic/runtime analysis, novel threats not in feeds, supply chain attacks on intel sources, network attacks during skill install, social engineering via skill descriptions.
-
 ## Intel Cache Staleness
 
 - **30+ days stale** → Warning (results may be outdated)
@@ -239,29 +218,6 @@ clawsec/
 
 Run `clawsec sync` to refresh stale intel sources.
 
-## Deployment
-
-### Docker
-
-```bash
-docker build -t lowwattlabs/clawsec .
-docker run -p 3100:3100 lowwattlabs/clawsec
-```
-
-### Systemd Services
-
-```bash
-# API service
-sudo cp clawsec-api.service /etc/systemd/system/
-sudo systemctl enable clawsec-api
-sudo systemctl start clawsec-api
-
-# Daily intel sync
-sudo cp clawsec-sync.service clawsec-sync.timer /etc/systemd/system/
-sudo systemctl enable clawsec-sync.timer
-sudo systemctl start clawsec-sync.timer
-```
-
 ## License
 
-MIT — Low Watt Labs
+MIT — Low Watt Labs ⚡
