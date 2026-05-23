@@ -27,9 +27,9 @@ if curl -fsSL --max-time 120 --retry 3 --retry-delay 5 "$URL" -o "$zip_tmp"; the
             echo -e "${CROSSMARK} URLhaus: extracted file is still a ZIP (sync may have failed)"
         else
             mv -f "$csv_tmp" "$TARGET"
+            python3 "$MANIFEST_PY" update urlhaus "$count" success
+            echo -e "${CHECKMARK} URLhaus: ${count} malicious URLs"
         fi
-        python3 "$MANIFEST_PY" update urlhaus "$count" success
-        echo -e "${CHECKMARK} URLhaus: ${count} malicious URLs"
     else
         rm -f "$csv_tmp"
         python3 "$MANIFEST_PY" update urlhaus 0 failed "unzip failed"

@@ -1,6 +1,6 @@
 {
   "name": "@lowwattlabs/clawsec",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "ClawSec - Security Verification for ClawHub Skills",
   "bin": {
     "clawsec": "./bin/clawsec.js",
@@ -21,11 +21,11 @@
   "dependencies": {
     "express": "^4.21.0",
     "rate-limiter-flexible": "^5.0.0",
-    "uuid": "^10.0.0",
+    "uuid": "^11.1.1",
     "cors": "^2.8.5"
   },
   "author": "Low Watt Labs",
-  "license": "MIT",
+  "license": "MIT-0",
   "repository": {
     "type": "git",
     "url": "https://github.com/jchandler187/clawsec.git"

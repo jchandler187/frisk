@@ -45,11 +45,20 @@ safe_download() {
     fi
 
     if [[ -n "$validate_cmd" ]]; then
-        if ! eval "$validate_cmd" "$tmp"; then
-            rm -f "$tmp"
-            echo "safe_download: validation failed for $url" >&2
-            return 1
-        fi
+        case "$validate_cmd" in
+            jq\ *)
+                # Invoke jq validation directly
+                if ! $validate_cmd "$tmp"; then
+                    rm -f "$tmp"
+                    echo "safe_download: validation failed for $url" >&2
+                    return 1
+                fi
+                ;;
+            *)
+                # Unknown validation command — warn and skip
+                echo "safe_download: unknown validation command '$validate_cmd', skipping validation" >&2
+                ;;
+        esac
     fi
 
     mv -f "$tmp" "$target"

@@ -1,6 +1,6 @@
 # ⚡ ClawSec
 
-Security verification tool that scans ClawHub skills against 10 continuously-updated threat intelligence sources using 7 autonomous security checks.
+Security verification tool that scans ClawHub skills against 9 continuously-updated threat intelligence sources using 7 autonomous security checks.
 
 If you find it useful, [buy me a coffee](https://buymeacoffee.com/lowwattlabs) ⚡
 
@@ -23,7 +23,7 @@ clawsec sync
 clawsec status
 ```
 
-First run automatically sets up a Python venv at `~/.clawsec/venv/` and installs dependencies.
+First run automatically sets up a Python venv at `~/.clawsec/venv/` and installs dependencies. The first `clawsec sync` (or auto-sync) downloads approximately 50–100 MB of threat intel data.
 
 ## Docker
 
@@ -220,4 +220,5 @@ Run `clawsec sync` to refresh stale intel sources.
 
 ## License
 
-MIT — Low Watt Labs ⚡
+MIT-0 — Low Watt Labs ⚡
+

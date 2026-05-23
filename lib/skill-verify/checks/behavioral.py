@@ -59,8 +59,8 @@ PATH_ABSOLUTE_FORBIDDEN = [
      "Absolute system path access outside workspace"),
     (r'["\']/root/',
      "Absolute path to /root — should not access root home"),
-    (r'["\']/home/(?!openclaw/)',
-     "Absolute path to another user's home directory"),
+    (r'["\']/home/',
+     "Absolute path to home directory - suspicious in skill code"),
 ]
 
 FETCH_EXEC_PATTERNS = [
@@ -92,7 +92,7 @@ def find_base64_payloads(content, threshold=2048):
             non_printable = sum(1 for b in decoded if b < 32 and b not in (9, 10, 13))
             if non_printable > len(decoded) * 0.1:
                 # ELF binaries embedded as base64 are critical — they're trojan horses
-                is_elf = decoded[:4] == b'ELF' or decoded[:4] == b'ELF'
+                is_elf = decoded[:4] == b'\x7fELF'
                 severity = "critical" if is_elf else "high"
                 desc = f"Embedded ELF binary ({len(decoded)} bytes)" if is_elf else f"Large base64 payload ({len(decoded)} bytes decoded, appears binary)"
                 findings.append({

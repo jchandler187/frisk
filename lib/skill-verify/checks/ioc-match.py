@@ -132,7 +132,7 @@ def check_intel_cache():
         missing.append("malwarebazaar")
     if not os.path.exists(os.path.join(INTEL_DIR, "feodo", "c2_ips.csv")):
         missing.append("feodo")
-    if not os.path.exists(os.path.join(INTEL_DIR, "threatfox")):
+    if not os.path.exists(os.path.join(INTEL_DIR, "threatfox", "iocs.csv")):
         missing.append("threatfox")
     return missing
 
@@ -277,6 +277,41 @@ def load_malwarebazaar_hashes():
                     hashes.add(h)
     return hashes
 
+
+
+def load_threatfox_iocs():
+    """Load ThreatFox IOCs (IPs, domains, URLs) from cached CSV.
+
+    ThreatFox CSV columns: ioc_value, threat_type, malware_malware_printable,
+    malware_malware_alias, malware_malware_type, tags, confidence_level
+    """
+    path = os.path.join(INTEL_DIR, "threatfox", "iocs.csv")
+    iocs = {"ips": set(), "domains": set(), "urls": set()}
+    if not os.path.exists(path):
+        return iocs
+    with open(path, errors='ignore') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row:
+                continue
+            line = row[0].strip() if row else ''
+            if line.startswith("#") or not line:
+                continue
+            if len(row) < 1:
+                continue
+            ioc_value = normalize(row[0].strip().strip("'").strip('"').lower())
+            if not ioc_value:
+                continue
+            # Classify IOC by type
+            if re.match(IP_PATTERN.pattern, ioc_value):
+                iocs["ips"].add(ioc_value)
+            elif ioc_value.startswith("http://") or ioc_value.startswith("https://"):
+                iocs["urls"].add(ioc_value.rstrip('/'))
+            elif DOMAIN_PATTERN.match(ioc_value):
+                if ioc_value not in SAFE_DOMAINS:
+                    iocs["domains"].add(ioc_value)
+    return iocs
+
 def check_ioc_match(skill_path):
     """Main check: extract IOCs, match against threat intel."""
     results = {
@@ -363,6 +398,39 @@ def check_ioc_match(skill_path):
                 "severity": "critical",
                 "description": "SHA256 hash matches MalwareBazaar sample"
             })
+    # Match against ThreatFox IOCs (IPs, domains, URLs)
+    tf_iocs = load_threatfox_iocs()
+    for ip in iocs["ips"]:
+        if ip in tf_iocs["ips"]:
+            results["findings"].append({
+                "type": "ip",
+                "value": ip,
+                "source": "threatfox",
+                "severity": "critical",
+                "description": f"IP {ip} listed in ThreatFox IOC database"
+            })
+    for dom in iocs["domains"]:
+        if dom in tf_iocs["domains"]:
+            results["findings"].append({
+                "type": "domain",
+                "value": dom,
+                "source": "threatfox",
+                "severity": "critical",
+                "description": f"Domain {dom} listed in ThreatFox IOC database"
+            })
+    for url in iocs["urls"]:
+        parsed_skill = urlparse(url.lower().rstrip('/'))
+        for bad_url in tf_iocs["urls"]:
+            parsed_bad = urlparse(bad_url)
+            if (parsed_skill.scheme, parsed_skill.hostname, parsed_skill.path) == (parsed_bad.scheme, parsed_bad.hostname, parsed_bad.path):
+                results["findings"].append({
+                    "type": "url",
+                    "value": url,
+                    "source": "threatfox",
+                    "severity": "critical",
+                    "description": "URL matches ThreatFox IOC database"
+                })
+                break
 
     # Determine status — intel_missing findings upgrade severity
     if results["findings"]:

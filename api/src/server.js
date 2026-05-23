@@ -39,7 +39,7 @@ app.use('/api/v1', routes);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', version: '2.3.3', uptime: process.uptime() });
+    res.json({ status: 'ok', version: '2.4.0', uptime: process.uptime() });
 });
 
 // Error handler
@@ -52,7 +52,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start
-app.listen(PORT, '0.0.0.0', () => {
-    console.log("⚡ ClawSec API v2.3.3 listening on 0.0.0.0:" + PORT);
+const HOST = process.env.CLAWSEC_HOST || '127.0.0.1';
+// NOTE: For Docker, set CLAWSEC_HOST=0.0.0.0 to bind all interfaces
+app.listen(PORT, HOST, () => {
+    console.log(`⚡ ClawSec API v2.4.0 listening on ${HOST}:${PORT}`);
     fs.mkdirSync(REPORTS_DIR, { recursive: true });
 });

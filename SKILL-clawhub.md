@@ -1,7 +1,7 @@
 ---
 name: clawsec
-description: "Scan ClawHub skills for security vulnerabilities before installing — 9 threat intel sources, 7 autonomous checks, instant slug scan."
-version: 2.3.3
+description: "Scan ClawHub skills for security vulnerabilities before installing — 9 continuously-updated threat intel sources, 7 autonomous checks, instant slug scan."
+version: 2.4.0
 metadata:
   openclaw:
     emoji: "⚡"
@@ -128,6 +128,7 @@ During `clawsec scan`, no network requests are made. All intel is local.
 - `~/.clawsec/intel/` — Synced threat intel data
 - `~/.clawsec/reports/` — Scan reports (JSON)
 - `~/.clawsec/venv/` — Python virtual environment for scan checks
+- `~/.clawsec/clawsec.log` — Scan log output
 
 ### Trust statement
 

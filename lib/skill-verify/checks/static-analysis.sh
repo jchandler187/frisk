@@ -29,8 +29,8 @@ fi
 
 tmpout=$(mktemp "${TMPDIR:-/tmp}/semgrep.XXXXXX.json")
 
-# Use --config auto for speed (community rules, pre-bundled)
-timeout 30 semgrep --config auto \
+# Use local semgrep rules from intel cache (no phone-home)
+timeout 30 semgrep --config "$SEMRULES_DIR" --metrics=off \
     --json \
     --timeout 10 \
     --max-target-bytes 500000 \

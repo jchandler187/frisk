@@ -50,7 +50,7 @@ function hardenSkillDir(dir) {
 // Create a restricted temp directory for skill downloads.
 // Returns the path to the temp dir.
 function createScanTempDir() {
-    const tmpDir = path.join(os.tmpdir(), 'clawsec-scan-' + uuidv4().slice(0, 8));
+    const tmpDir = path.join(os.tmpdir(), 'clawsec-scan-' + uuidv4());
     fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
     return tmpDir;
 }
@@ -135,8 +135,8 @@ router.post('/scan', (req, res) => {
             return res.status(400).json({ error: 'Could not resolve skill target' });
         }
 
-        // Run verification
-        const verifyWrapper = path.join(CLAWSEC_DIR, 'api', 'src', 'verify-wrapper.sh');
+        // Run verification — resolve from package root, not CLAWSEC_DIR
+        const verifyWrapper = path.join(__dirname, 'verify-wrapper.sh');
         let result;
         try {
             const output = execFileSync('bash', [verifyWrapper, targetDir], {
@@ -161,7 +161,7 @@ router.post('/scan', (req, res) => {
         }
 
         // Save report
-        const reportId = result.report_id || uuidv4().slice(0, 8);
+        const reportId = result.report_id || uuidv4();
         const reportPath = path.join(REPORTS_DIR, reportId + '.json');
         fs.writeFileSync(reportPath, JSON.stringify(result, null, 2));
 
