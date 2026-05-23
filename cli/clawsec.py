@@ -19,7 +19,7 @@ import sys
 import time
 from pathlib import Path
 
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 CLAWSEC_DIR = os.environ.get("CLAWSEC_HOME", os.path.expanduser("~/.clawsec"))
 INTEL_DIR = os.environ.get("CLAWSEC_INTEL_DIR", os.path.join(CLAWSEC_DIR, "intel"))
 REPORTS_DIR = os.environ.get("CLAWSEC_REPORTS_DIR", os.path.join(CLAWSEC_DIR, "reports"))
@@ -91,6 +91,11 @@ def cmd_scan(args):
 
 def cmd_sync(args):
     """Run intel sync."""
+    # Ensure intel directories exist
+    intel_dirs = ['cisa-kev', 'osv', 'osv/npm', 'osv/PyPI', 'epss', 'malwarebazaar', 'urlhaus', 'threatfox', 'feodo', 'yara-rules', 'semgrep-rules']
+    for d in intel_dirs:
+        os.makedirs(os.path.join(INTEL_DIR, d), exist_ok=True)
+    os.makedirs(REPORTS_DIR, exist_ok=True)
     sync_sh = os.path.join(PKG_ROOT, "lib", "intel-sync", "sync.sh")
     if not os.path.exists(sync_sh):
         sync_sh = os.path.join(CLAWSEC_DIR, "lib", "intel-sync", "sync.sh")

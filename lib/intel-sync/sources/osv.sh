@@ -59,9 +59,11 @@ for eco in "${ECOSYSTEMS[@]}"; do
 
     if [[ -d "$eco_dir" ]]; then
         # Build index using Python for speed
-        python3 -c "
+        # Pass both eco_dir and index_file as arguments to avoid bash-in-Python variable scoping
+        index_count=$(python3 -c "
 import json, os, sys
 eco_dir = sys.argv[1]
+index_path = sys.argv[2]
 index = {}
 for fname in os.listdir(eco_dir):
     if not fname.endswith('.json') or fname == 'index.json':
@@ -81,12 +83,12 @@ for fname in os.listdir(eco_dir):
     except (json.JSONDecodeError, KeyError, OSError):
         continue
 # Write index atomically
-tmp = index_file + '.new'
+tmp = index_path + '.new'
 with open(tmp, 'w') as f:
     json.dump(index, f)
-os.rename(tmp, index_file)
-" "$eco_dir"
-        index_count=$(python3 -c "import json; print(len(json.load(open('$index_file'))))" 2>/dev/null || echo "?")
+os.rename(tmp, index_path)
+print(len(index))
+" "$eco_dir" "$index_file")
         log_info "OSV $eco index: $index_count packages"
     fi
 done
