@@ -102,13 +102,13 @@ def cmd_scan(args):
     # If it looks like a slug, try to download from ClawHub
     if is_slug(target):
         if not json_mode:
-            print(f"  {C}⚡ Downloading '{target}' from ClawHub...{RESET}")
+            print(f"  {C}⚡ Downloading '{target}' from ClawHub...{RESET}", flush=True)
         result = download_slug(target)
         if result is None:
             sys.exit(2)
         target, cleanup_dir = result
         if not json_mode:
-            print(f"  {G}✓{RESET} Downloaded to {target}")
+            print(f"  {G}✓{RESET} Downloaded to {target}", flush=True)
 
     if not os.path.exists(target):
         print(f"{R}Error:{RESET} '{args.target}' not found (not a local path and not a valid ClawHub slug)", file=sys.stderr)
