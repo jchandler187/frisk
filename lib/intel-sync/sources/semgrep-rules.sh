@@ -9,13 +9,13 @@ INTEL_DIR="${CLAWSEC_INTEL_DIR}"
 REPO_DIR="${INTEL_DIR}/semgrep-rules/repo"
 MANIFEST_PY="$(dirname "$0")/../manifest.py"
 
-log_info "Syncing Semgrep rules (returntocorp/semgrep-rules)..."
+log_info "Syncing Semgrep rules (semgrep/semgrep-rules)..."
 
 if [[ -d "$REPO_DIR/.git" ]]; then
     git -C "$REPO_DIR" pull --quiet 2>/dev/null && status="success" || status="failed"
 else
     rm -rf "$REPO_DIR"
-    git clone --depth 1 https://github.com/returntocorp/semgrep-rules.git "$REPO_DIR" 2>/dev/null && status="success" || status="failed"
+    git clone --depth 1 https://github.com/semgrep/semgrep-rules.git "$REPO_DIR" 2>/dev/null && status="success" || status="failed"
 fi
 
 if [[ "$status" == "success" ]]; then

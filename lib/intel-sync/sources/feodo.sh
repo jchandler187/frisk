@@ -16,10 +16,17 @@ log_info "Syncing Feodo Tracker..."
 
 tmp=$(mktemp "${TARGET}.XXXXXX.new")
 if curl -fsSL --max-time 60 --retry 3 --retry-delay 5 "$URL" -o "$tmp"; then
-    count=$(grep -cv '^#' "$tmp" 2>/dev/null || echo 0)
-    mv -f "$tmp" "$TARGET"
-    python3 "$MANIFEST_PY" update feodo "$count" success
-    echo -e "${CHECKMARK} Feodo Tracker: ${count} C2 IPs"
+    # Validate CSV content (not HTML error page or garbage)
+    if ! validate_csv "$tmp" '^#'; then
+        rm -f "$tmp"
+        python3 "$MANIFEST_PY" update feodo 0 failed "CSV validation failed (not valid CSV)"
+        echo -e "${CROSSMARK} Feodo Tracker: CSV validation failed"
+    else
+        count=$(grep -cv '^#' "$tmp" 2>/dev/null || echo 0)
+        mv -f "$tmp" "$TARGET"
+        python3 "$MANIFEST_PY" update feodo "$count" success
+        echo -e "${CHECKMARK} Feodo Tracker: ${count} C2 IPs"
+    fi
 else
     rm -f "$tmp"
     python3 "$MANIFEST_PY" update feodo 0 failed "download failed"

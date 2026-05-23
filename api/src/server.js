@@ -39,7 +39,7 @@ app.use('/api/v1', routes);
 
 // Health check
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', version: '2.4.1', uptime: process.uptime() });
+    res.json({ status: 'ok', version: '2.5.0', uptime: process.uptime() });
 });
 
 // Error handler

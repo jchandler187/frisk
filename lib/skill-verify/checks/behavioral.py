@@ -253,5 +253,13 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: behavioral.py <skill_path>")
         sys.exit(1)
-    result = check_behavioral(sys.argv[1])
+    try:
+        result = check_behavioral(sys.argv[1])
+    except Exception as e:
+        result = {
+            "check": "behavioral_heuristics",
+            "status": "warn",
+            "findings": [],
+            "errors": [f"Behavioral analysis failed: {str(e)}"]
+        }
     print(json.dumps(result, indent=2))

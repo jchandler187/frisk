@@ -3,7 +3,7 @@
 # Runs all intel source sync jobs, gracefully handling failures
 set -euo pipefail
 
-VERSION="2.4.1"
+VERSION="2.5.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SOURCES_DIR="${SCRIPT_DIR}/sources"
 

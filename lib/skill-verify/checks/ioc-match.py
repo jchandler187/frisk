@@ -451,5 +451,14 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: ioc-match.py <skill_path>")
         sys.exit(1)
-    result = check_ioc_match(sys.argv[1])
+    try:
+        result = check_ioc_match(sys.argv[1])
+    except Exception as e:
+        result = {
+            "check": "ioc_match",
+            "status": "warn",
+            "findings": [],
+            "errors": [f"IOC match analysis failed: {str(e)}"],
+            "extracted": {"urls": 0, "ips": 0, "domains": 0, "hashes": 0}
+        }
     print(json.dumps(result, indent=2))

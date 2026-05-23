@@ -76,3 +76,14 @@ script_dir() {
     done
     cd -P "$(dirname "$src")" && pwd
 }
+# Validate CSV: check first line starts with alpha header (not HTML error)
+# Usage: validate_csv <file> [header_pattern]
+# Returns 0 if valid, 1 if invalid (e.g., HTML error page, empty file)
+validate_csv() {
+    local file="$1"
+    local header_pattern="${2:-^[a-zA-Z]}"
+    if ! head -1 "$file" | grep -qE "$header_pattern"; then
+        return 1
+    fi
+    return 0
+}

@@ -22,7 +22,17 @@ fi
 tmpout=$(mktemp "${TMPDIR:-/tmp}/gitleaks.XXXXXX.json")
 
 # gitleaks detect with no-git flag for untracked dirs
-gitleaks detect --source "$skill_path" --no-git --report-format json --report-path "$tmpout" 2>/dev/null || true
+gitleaks_rc=0
+gitleaks detect --source "$skill_path" --no-git --report-format json --report-path "$tmpout" 2>/dev/null || gitleaks_rc=$?
+
+# Handle gitleaks crash
+if [[ "$gitleaks_rc" -ne 0 ]] && [[ "$gitleaks_rc" -ne 1 ]] && [[ ! -s "$tmpout" ]]; then
+    # exit 1 = findings found (expected), other exits with empty output = crash
+    results='{"check":"secret_scan","status":"warn","findings":[],"errors":["gitleaks crashed (exit '$gitleaks_rc') — results may be incomplete"]}'
+    rm -f "$tmpout"
+    echo "$results"
+    exit 0
+fi
 
 if [[ -s "$tmpout" ]] && jq empty "$tmpout" 2>/dev/null; then
     count=$(jq 'length' "$tmpout")

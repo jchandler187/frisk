@@ -32,7 +32,8 @@ First run automatically sets up a Python venv at `~/.clawsec/venv/` and installs
 docker build -t lowwattlabs/clawsec .
 
 # Run
-docker run -p 3100:3100 lowwattlabs/clawsec
+docker run -p 3100:3100 -e CLAWSEC_HOST=0.0.0.0 lowwattlabs/clawsec
+> **Note:** The API server defaults to 127.0.0.1 (loopback only). Docker needs `CLAWSEC_HOST=0.0.0.0` to accept connections from outside the container.
 
 # Scan via API inside container
 docker run lowwattlabs/clawsec clawsec scan /path/to/skill

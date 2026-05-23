@@ -30,12 +30,26 @@ fi
 tmpout=$(mktemp "${TMPDIR:-/tmp}/semgrep.XXXXXX.json")
 
 # Use local semgrep rules from intel cache (no phone-home)
+semgrep_rc=0
 timeout 30 semgrep --config "$SEMRULES_DIR" --metrics=off \
     --json \
     --timeout 10 \
     --max-target-bytes 500000 \
     --quiet \
-    "$skill_path" > "$tmpout" 2>/dev/null || true
+    "$skill_path" > "$tmpout" 2>/dev/null || semgrep_rc=$?
+
+# Handle semgrep crash or timeout
+if [[ "$semgrep_rc" -eq 124 ]]; then
+    results='{"check":"static_analysis","status":"warn","findings":[],"errors":["semgrep timed out — results may be incomplete"]}'
+    rm -f "$tmpout"
+    echo "$results"
+    exit 0
+elif [[ "$semgrep_rc" -ne 0 ]] && [[ ! -s "$tmpout" ]]; then
+    results='{"check":"static_analysis","status":"warn","findings":[],"errors":["semgrep crashed (exit '$semgrep_rc') — results may be incomplete"]}'
+    rm -f "$tmpout"
+    echo "$results"
+    exit 0
+fi
 
 if jq empty "$tmpout" 2>/dev/null; then
     count=$(jq '.results | length' "$tmpout")
@@ -60,10 +74,20 @@ if jq empty "$tmpout" 2>/dev/null; then
             ]
         ')
         
-        # Recount escalation levels
-        crit=$(echo "$results" | jq '[.findings[] | select(.severity == "ERROR")] | length')
-        warn=$(echo "$results" | jq '[.findings[] | select(.severity == "WARNING")] | length')
-        info=$(echo "$results" | jq '[.findings[] | select(.severity == "INFO")] | length')
+        # Map Semgrep severity to ClawSec scale: ERROR→high, WARNING→medium, INFO→low
+        results=$(echo "$results" | jq '
+            .findings = [.findings[] |
+                if .severity == "ERROR" then .severity = "high"
+                elif .severity == "WARNING" then .severity = "medium"
+                elif .severity == "INFO" then .severity = "low"
+                else . end
+            ]
+        ]')
+
+        # Recount by ClawSec severity
+        crit=$(echo "$results" | jq '[.findings[] | select(.severity == "high" or .severity == "critical")] | length')
+        warn=$(echo "$results" | jq '[.findings[] | select(.severity == "medium")] | length')
+        info=$(echo "$results" | jq '[.findings[] | select(.severity == "low")] | length')
         
         if [[ "$crit" -gt 0 ]]; then status="fail"
         elif [[ "$warn" -gt 0 ]]; then status="warn"

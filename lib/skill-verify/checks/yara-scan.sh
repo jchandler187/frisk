@@ -18,12 +18,12 @@ skill_path="${1:?Usage: yara-scan.sh <skill_path>}"
 results='{"check":"yara_scan","status":"pass","findings":[],"errors":[]}'
 
 if ! command -v yara &>/dev/null; then
-    echo '{"check":"yara_scan","status":"pass","findings":[],"errors":["yara not installed — skipping"]}'
+    echo '{"check":"yara_scan","status":"warn","findings":[],"errors":["yara not installed — skipping"]}'
     exit 0
 fi
 
 if [[ ! -d "$YARA_RULES_DIR" ]]; then
-    echo '{"check":"yara_scan","status":"pass","findings":[],"errors":["YARA rules not synced — skipping"]}'
+    echo '{"check":"yara_scan","status":"warn","findings":[],"errors":["YARA rules not synced — skipping"]}'
     exit 0
 fi
 

@@ -16,11 +16,18 @@ log_info "Syncing ThreatFox..."
 
 tmp=$(mktemp "${TARGET}.XXXXXX.new")
 if curl -fsSL --max-time 120 --retry 3 --retry-delay 5 "$URL" -o "$tmp"; then
-    # Count actual data lines (skip comment lines starting with #)
-    count=$(grep -cv '^#' "$tmp" 2>/dev/null || echo 0)
-    mv -f "$tmp" "$TARGET"
-    python3 "$MANIFEST_PY" update threatfox "$count" success
-    echo -e "${CHECKMARK} ThreatFox: ${count} IOCs"
+    # Validate CSV content (not HTML error page or garbage)
+    if ! validate_csv "$tmp" '^#'; then
+        rm -f "$tmp"
+        python3 "$MANIFEST_PY" update threatfox 0 failed "CSV validation failed (not valid CSV)"
+        echo -e "${CROSSMARK} ThreatFox: CSV validation failed"
+    else
+        # Count actual data lines (skip comment lines starting with #)
+        count=$(grep -cv '^#' "$tmp" 2>/dev/null || echo 0)
+        mv -f "$tmp" "$TARGET"
+        python3 "$MANIFEST_PY" update threatfox "$count" success
+        echo -e "${CHECKMARK} ThreatFox: ${count} IOCs"
+    fi
 else
     rm -f "$tmp"
     python3 "$MANIFEST_PY" update threatfox 0 failed "download failed"

@@ -1,5 +1,4 @@
 # ClawSec v2 Python dependencies
-requests>=2.31.0
 yara-python>=4.5.0
 rich>=13.7.0
 semgrep>=1.50.0

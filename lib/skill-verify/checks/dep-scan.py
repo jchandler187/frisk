@@ -313,6 +313,9 @@ def check_dependencies(skill_path):
             "severity": "critical",
             "description": f"Required intel source {source} is missing or corrupt. Results may be incomplete."
         })
+    if missing:
+        results["status"] = "warn"
+        results["errors"].append("Intel sources missing: " + ", ".join(missing) + " — results may be incomplete")
     if not os.path.isdir(INTEL_DIR):
         results["status"] = "fail"
         results["errors"].append("intel cache directory missing")
@@ -457,5 +460,13 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: dep-scan.py <skill_path>")
         sys.exit(1)
-    result = check_dependencies(sys.argv[1])
+    try:
+        result = check_dependencies(sys.argv[1])
+    except Exception as e:
+        result = {
+            "check": "dependency_scan",
+            "status": "warn",
+            "findings": [],
+            "errors": [f"Dependency scan failed: {str(e)}"]
+        }
     print(json.dumps(result, indent=2))

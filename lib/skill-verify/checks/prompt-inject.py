@@ -159,5 +159,13 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: prompt-inject.py <skill_path>")
         sys.exit(1)
-    result = check_prompt_injection(sys.argv[1])
+    try:
+        result = check_prompt_injection(sys.argv[1])
+    except Exception as e:
+        result = {
+            "check": "prompt_injection",
+            "status": "warn",
+            "findings": [],
+            "errors": [f"Prompt injection analysis failed: {str(e)}"]
+        }
     print(json.dumps(result, indent=2))
