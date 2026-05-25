@@ -36,3 +36,7 @@ Initial unified release. Frisk consolidates the former ClawSec/SafeInstall proje
 - Removed stale .bak file and __pycache__ from repo/tarball
 - Added *.bak, __pycache__/, frisk-temp/ to .npmignore
 - All version strings unified to 3.0.2
+
+## v3.0.3 (2026-05-25)
+- Fixed __pycache__ inclusion in npm tarball (added **/__pycache__/ to .npmignore)
+- Cleaned all __pycache__ directories from repo

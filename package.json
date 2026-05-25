@@ -1,6 +1,6 @@
 {
   "name": "@lowwattlabs/frisk",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "\u26a1 Frisk \u2014 Local-first security scanner for ClawHub skills. 9 intel sources, 7 checks, zero phone-home.",
   "bin": {
     "frisk": "./bin/frisk.js",
