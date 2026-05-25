@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# ⚡ Low Watt Labs — ClawSec
-"""⚡ ClawSec v2 — Skill Security Verification
+# ⚡ Low Watt Labs — Frisk
+"""⚡ Frisk v2 — Skill Security Verification
 
 Usage:
-    clawsec scan <slug|path>   Verify a skill
-    clawsec sync [source...]   Refresh intel cache
-    clawsec status             Show cache status
-    clawsec report <id>        View a saved report
-    clawsec --help             Show help
-    clawsec --version          Show version
+    frisk scan <slug|path>   Verify a skill
+    frisk sync [source...]   Refresh intel cache
+    frisk status             Show cache status
+    frisk report <id>        View a saved report
+    frisk --help             Show help
+    frisk --version          Show version
 """
 
 import argparse
@@ -23,11 +23,11 @@ import time
 from pathlib import Path
 
 VERSION = "2.5.0"
-CLAWSEC_DIR = os.environ.get("CLAWSEC_HOME", os.path.expanduser("~/.clawsec"))
-INTEL_DIR = os.environ.get("CLAWSEC_INTEL_DIR", os.path.join(CLAWSEC_DIR, "intel"))
-REPORTS_DIR = os.environ.get("CLAWSEC_REPORTS_DIR", os.path.join(CLAWSEC_DIR, "reports"))
+FRISK_DIR = os.environ.get("FRISK_HOME", os.path.expanduser("~/.frisk"))
+INTEL_DIR = os.environ.get("FRISK_INTEL_DIR", os.path.join(FRISK_DIR, "intel"))
+REPORTS_DIR = os.environ.get("FRISK_REPORTS_DIR", os.path.join(FRISK_DIR, "reports"))
 
-# Resolve package root — cli/clawsec.py -> parent = package root
+# Resolve package root — cli/frisk.py -> parent = package root
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PKG_ROOT = os.path.dirname(SCRIPT_DIR)
 
@@ -45,7 +45,7 @@ RESET = "\033[0m"
 def banner():
     print(f"""{BOLD}
   ╔═════════════════════════════════════════╗
-  ║   ClawSec v{VERSION}                      ║
+  ║   Frisk v{VERSION}                      ║
   ║   ⚡ Security Verification for ClawHub  ║
   ╚═════════════════════════════════════════╝{RESET}
 """)
@@ -93,7 +93,7 @@ def download_slug(slug):
     Returns (skill_path, cleanup_dir) or None on failure.
     """
     # Create temp dir with restricted permissions (owner only)
-    tmpdir = tempfile.mkdtemp(prefix="clawsec-scan-")
+    tmpdir = tempfile.mkdtemp(prefix="frisk-scan-")
     os.chmod(tmpdir, stat.S_IRWXU)  # 0700 — owner read/write/exec only
 
     try:
@@ -161,9 +161,9 @@ def cmd_scan(args):
 
     # Run verify.sh — resolve relative to package root
     verify_sh = os.path.join(PKG_ROOT, "lib", "skill-verify", "verify.sh")
-    # Fallback: check CLAWSEC_HOME (for dev/local setups)
+    # Fallback: check FRISK_HOME (for dev/local setups)
     if not os.path.exists(verify_sh):
-        verify_sh = os.path.join(CLAWSEC_DIR, "lib", "skill-verify", "verify.sh")
+        verify_sh = os.path.join(FRISK_DIR, "lib", "skill-verify", "verify.sh")
 
     cmd = ["bash", verify_sh]
     if json_mode:
@@ -193,7 +193,7 @@ def cmd_sync(args):
 
     sync_sh = os.path.join(PKG_ROOT, "lib", "intel-sync", "sync.sh")
     if not os.path.exists(sync_sh):
-        sync_sh = os.path.join(CLAWSEC_DIR, "lib", "intel-sync", "sync.sh")
+        sync_sh = os.path.join(FRISK_DIR, "lib", "intel-sync", "sync.sh")
 
     cmd = ["bash", sync_sh]
     if args.json:
@@ -207,7 +207,7 @@ def cmd_status(args):
     """Show cache status."""
     manifest_py = os.path.join(PKG_ROOT, "lib", "intel-sync", "manifest.py")
     if not os.path.exists(manifest_py):
-        manifest_py = os.path.join(CLAWSEC_DIR, "lib", "intel-sync", "manifest.py")
+        manifest_py = os.path.join(FRISK_DIR, "lib", "intel-sync", "manifest.py")
     manifest_path = os.path.join(INTEL_DIR, "manifest.json")
 
     if args.json:
@@ -216,7 +216,7 @@ def cmd_status(args):
         return
 
     if not os.path.exists(manifest_path):
-        print(f"  {Y}No intel cache found{RESET}. Run {BOLD}clawsec sync{RESET} first.")
+        print(f"  {Y}No intel cache found{RESET}. Run {BOLD}frisk sync{RESET} first.")
         return
 
     with open(manifest_path) as f:
@@ -308,19 +308,19 @@ def cmd_report(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="clawsec",
-        description="⚡ ClawSec v2 — Security Verification for ClawHub Skills",
+        prog="frisk",
+        description="⚡ Frisk v2 — Security Verification for ClawHub Skills",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""Examples:
-  clawsec scan ./my-skill          Verify a local skill directory
-  clawsec scan weather-forecast     Download and scan from ClawHub
-  clawsec scan ./my-skill --json   Machine-readable output
-  clawsec sync                     Refresh all intel sources
-  clawsec sync cisa-kev epss       Sync specific sources
-  clawsec status                   Show cache status
-  clawsec report abc123            View saved report"""
+  frisk scan ./my-skill          Verify a local skill directory
+  frisk scan weather-forecast     Download and scan from ClawHub
+  frisk scan ./my-skill --json   Machine-readable output
+  frisk sync                     Refresh all intel sources
+  frisk sync cisa-kev epss       Sync specific sources
+  frisk status                   Show cache status
+  frisk report abc123            View saved report"""
     )
-    parser.add_argument("--version", action="version", version=f"clawsec v{VERSION}")
+    parser.add_argument("--version", action="version", version=f"frisk v{VERSION}")
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 

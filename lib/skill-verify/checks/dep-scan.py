@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 # ⚡ Low Watt Labs
 # SECURITY MANIFEST:
-# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config imports)
+# Environment variables accessed: FRISK_HOME, FRISK_INTEL_DIR (via config imports)
 # External endpoints called: none (all intel is local)
 # Local files read: skill_path (target directory), intel cache
 # Local files written: none
-"""ClawSec v2 - Dependency Scan
+"""Frisk v2 - Dependency Scan
 
 Scans skill dependencies against local OSV + CISA KEV + EPSS caches.
 """
@@ -251,7 +251,7 @@ def check_staleness(missing_criticals=None):
                 "category": "intel_stale",
                 "source": src["name"],
                 "severity": "critical",
-                "description": f"Intel source {src['name']} has never been synced. Run: clawsec sync {src['name']}"
+                "description": f"Intel source {src['name']} has never been synced. Run: frisk sync {src['name']}"
             })
             continue
 
@@ -270,14 +270,14 @@ def check_staleness(missing_criticals=None):
                 "category": "intel_stale",
                 "source": src["name"],
                 "severity": "critical",
-                "description": f"Intel source {src['name']} is {age_days} days old (>= 90 days). Scan results cannot be trusted. Run: clawsec sync {src['name']}"
+                "description": f"Intel source {src['name']} is {age_days} days old (>= 90 days). Scan results cannot be trusted. Run: frisk sync {src['name']}"
             })
         elif age_days >= 30:
             findings.append({
                 "category": "intel_stale",
                 "source": src["name"],
                 "severity": "high",
-                "description": f"Intel source {src['name']} is {age_days} days old (>= 30 days). Results may be outdated. Run: clawsec sync {src['name']}"
+                "description": f"Intel source {src['name']} is {age_days} days old (>= 30 days). Results may be outdated. Run: frisk sync {src['name']}"
             })
 
     return findings

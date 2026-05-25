@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * ⚡ ClawSec CLI Entry Point
- * Bootstraps Python venv if needed, then delegates to clawsec.py
+ * ⚡ Frisk CLI Entry Point
+ * Bootstraps Python venv if needed, then delegates to frisk.py
  */
 
 const { spawn, execSync } = require('child_process');
@@ -9,15 +9,15 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-const CLAWSEC_HOME = process.env.CLAWSEC_HOME || path.join(os.homedir(), '.clawsec');
-const VENV_DIR = path.join(CLAWSEC_HOME, 'venv');
+const FRISK_HOME = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
+const VENV_DIR = path.join(FRISK_HOME, 'venv');
 const PYTHON = path.join(VENV_DIR, 'bin', 'python3');
 
-// Resolve package root — walk up from __dirname to find cli/clawsec.py
+// Resolve package root — walk up from __dirname to find cli/frisk.py
 function findPackageRoot() {
   let dir = __dirname;
   // Check if we're running from installed package
-  if (fs.existsSync(path.join(dir, '..', 'cli', 'clawsec.py'))) {
+  if (fs.existsSync(path.join(dir, '..', 'cli', 'frisk.py'))) {
     return path.resolve(dir, '..');
   }
   // Fallback
@@ -25,7 +25,7 @@ function findPackageRoot() {
 }
 
 const PKG_ROOT = findPackageRoot();
-const CLAWSEC_PY = path.join(PKG_ROOT, 'cli', 'clawsec.py');
+const FRISK_PY = path.join(PKG_ROOT, 'cli', 'frisk.py');
 const REQUIREMENTS = path.join(PKG_ROOT, 'requirements.txt');
 
 function log(msg) {
@@ -38,11 +38,11 @@ function setupVenv() {
     return true;
   }
 
-  log('⚡ Setting up ClawSec Python environment (first run only)...');
+  log('⚡ Setting up Frisk Python environment (first run only)...');
 
   try {
-    // Create CLAWSEC_HOME
-    fs.mkdirSync(CLAWSEC_HOME, { recursive: true });
+    // Create FRISK_HOME
+    fs.mkdirSync(FRISK_HOME, { recursive: true });
 
     // Create venv
     log('  Creating Python venv...');
@@ -59,7 +59,7 @@ function setupVenv() {
     return true;
   } catch (err) {
     log(`❌ Failed to set up Python environment: ${err.message}`);
-    log('   Try running: clawsec setup');
+    log('   Try running: frisk setup');
     return false;
   }
 }
@@ -71,13 +71,13 @@ function run() {
   }
 
   // Build args — pass through all CLI args
-  const args = [CLAWSEC_PY, ...process.argv.slice(2)];
+  const args = [FRISK_PY, ...process.argv.slice(2)];
 
   // Set env vars for Python subprocess
   const env = {
     ...process.env,
-    CLAWSEC_HOME: CLAWSEC_HOME,
-    CLAWSEC_INTEL_DIR: process.env.CLAWSEC_INTEL_DIR || path.join(CLAWSEC_HOME, 'intel'),
+    FRISK_HOME: FRISK_HOME,
+    FRISK_INTEL_DIR: process.env.FRISK_INTEL_DIR || path.join(FRISK_HOME, 'intel'),
     PATH: `${path.join(os.homedir(), '.local', 'bin')}:${process.env.PATH || '/usr/local/bin:/usr/bin:/bin'}`,
   };
 
@@ -91,7 +91,7 @@ function run() {
   });
 
   child.on('error', (err) => {
-    log(`❌ Failed to run clawsec: ${err.message}`);
+    log(`❌ Failed to run frisk: ${err.message}`);
     process.exit(1);
   });
 }

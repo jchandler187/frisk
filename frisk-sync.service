@@ -1,11 +1,11 @@
 [Unit]
-Description=ClawSec Intel Sync Service
+Description=Frisk Intel Sync Service
 
 [Service]
 Type=oneshot
 User=openclaw
-WorkingDirectory=/home/openclaw/projects/clawsec
-ExecStart=/bin/bash /home/openclaw/projects/clawsec/lib/intel-sync/sync.sh
+WorkingDirectory=/home/openclaw/projects/frisk
+ExecStart=/bin/bash /home/openclaw/projects/frisk/lib/intel-sync/sync.sh
 Environment=PATH=/home/openclaw/.local/bin:/home/openclaw/bin:/usr/local/bin:/usr/bin:/bin
 
 [Install]

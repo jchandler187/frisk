@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ClawSec Common - Utilities
+# Frisk Common - Utilities
 
 # Atomic write: write content to tmp file, validate, then mv
 # Usage: atomic_write <target_path> <content_from_stdin>

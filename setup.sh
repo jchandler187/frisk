@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# ⚡ ClawSec v2 Dependency Setup
+# ⚡ Frisk v2 Dependency Setup
 # Installs all required tools for intel-sync and skill-verify
 set -euo pipefail
 
 VERSION="2.0.0"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "${SCRIPT_DIR}/lib/common/config.sh"
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
-CLAWSEC_USER="$(whoami)"
+INTEL_DIR="${FRISK_INTEL_DIR}"
+FRISK_USER="$(whoami)"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -24,7 +24,7 @@ log_err()   { echo -e "${RED}[ERR ]${RESET} $*"; }
 banner() {
     echo -e "${BOLD}"
     echo "  ╔═══════════════════════════════════════╗"
-    echo "  ║     ClawSec v${VERSION} Setup               ║"
+    echo "  ║     Frisk v${VERSION} Setup               ║"
     echo "  ║     ⚡ Security Verification for Skills ║"
     echo "  ╚═══════════════════════════════════════╝"
     echo -e "${RESET}"
@@ -107,11 +107,11 @@ install_yara_python() {
 }
 
 setup_dirs() {
-    log_info "Setting up directory structure at ${CLAWSEC_HOME}..."
+    log_info "Setting up directory structure at ${FRISK_HOME}..."
     mkdir -p "${INTEL_DIR}"/{cisa-kev,osv,epss,malwarebazaar,urlhaus,threatfox,feodo,yara-rules,semgrep-rules}
-    mkdir -p "${CLAWSEC_HOME}/reports"
-    mkdir -p "${CLAWSEC_HOME}/venv"
-    log_ok "Directory structure ready at ${CLAWSEC_HOME}"
+    mkdir -p "${FRISK_HOME}/reports"
+    mkdir -p "${FRISK_HOME}/venv"
+    log_ok "Directory structure ready at ${FRISK_HOME}"
 }
 
 clone_rule_repos() {
@@ -138,7 +138,7 @@ clone_rule_repos() {
 
 setup_python_env() {
     log_info "Setting up Python virtual environment..."
-    local venv_dir="${CLAWSEC_HOME}/venv"
+    local venv_dir="${FRISK_HOME}/venv"
     if [[ ! -d "$venv_dir" ]] || [[ ! -f "$venv_dir/bin/python3" ]]; then
         python3 -m venv "$venv_dir"
     fi
@@ -193,8 +193,8 @@ main() {
     verify_install
 
     echo ""
-    log_ok "Setup complete. Run: clawsec scan <path>  (to verify a skill)"
-    log_ok "               clawsec sync          (to populate intel cache)"
+    log_ok "Setup complete. Run: frisk scan <path>  (to verify a skill)"
+    log_ok "               frisk sync          (to populate intel cache)"
 }
 
 main "$@"

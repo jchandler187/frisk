@@ -1,14 +1,14 @@
 [Unit]
-Description=ClawSec Cloud API
+Description=Frisk Cloud API
 After=network.target
 
 [Service]
 Type=simple
 User=openclaw
-WorkingDirectory=/home/openclaw/projects/clawsec
+WorkingDirectory=/home/openclaw/projects/frisk
 ExecStart=/usr/bin/node api/src/server.js
 Environment=PATH=/home/openclaw/.local/bin:/home/openclaw/bin:/usr/local/bin:/usr/bin:/bin
-Environment=CLAWSEC_PORT=3100
+Environment=FRISK_PORT=3100
 Environment=NODE_ENV=production
 Restart=on-failure
 RestartSec=5

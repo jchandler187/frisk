@@ -7,7 +7,7 @@ source "$(dirname "$0")/../../common/colors.sh"
 source "$(dirname "$0")/../../common/log.sh"
 source "$(dirname "$0")/../../common/utils.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 TARGET="${INTEL_DIR}/cisa-kev/known_exploited_vulnerabilities.json"
 URL="https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json"
 MANIFEST_PY="$(dirname "$0")/../manifest.py"

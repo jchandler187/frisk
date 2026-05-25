@@ -1,5 +1,5 @@
-# ⚡ Low Watt Labs — ClawSec Skill Verification Report
-"""ClawSec v2 - Report Generator
+# ⚡ Low Watt Labs — Frisk Skill Verification Report
+"""Frisk v2 - Report Generator
 
 Aggregates check results into a final JSON report with verdict.
 """
@@ -11,9 +11,9 @@ import uuid
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'common'))
-from config import CLAWSEC_HOME, INTEL_DIR
+from config import FRISK_HOME, INTEL_DIR
 
-REPORTS_DIR = os.path.join(CLAWSEC_HOME, "reports")
+REPORTS_DIR = os.path.join(FRISK_HOME, "reports")
 
 def generate_report(skill_path, check_results):
     """Generate a final report from all check results."""

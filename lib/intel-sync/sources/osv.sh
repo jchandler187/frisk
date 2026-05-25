@@ -12,7 +12,7 @@ source "$(dirname "$0")/../../common/colors.sh"
 source "$(dirname "$0")/../../common/log.sh"
 source "$(dirname "$0")/../../common/utils.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 OSV_DIR="${INTEL_DIR}/osv"
 MANIFEST_PY="$(dirname "$0")/../manifest.py"
 URL_BASE="https://osv-vulnerabilities.storage.googleapis.com"

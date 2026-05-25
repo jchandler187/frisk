@@ -1,5 +1,4 @@
-# ClawHub publish ignore — only SKILL-clawhub.md gets published
-# Full project is on npm, this is the ClawHub skill card
+# Only SKILL.md gets published to ClawHub; full package is on npm
 node_modules/
 api/
 tests/

@@ -7,7 +7,7 @@ source "$(dirname "$0")/../../common/colors.sh"
 source "$(dirname "$0")/../../common/log.sh"
 source "$(dirname "$0")/../../common/utils.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 REPO_DIR="${INTEL_DIR}/yara-rules/repo"
 MANIFEST_PY="$(dirname "$0")/../manifest.py"
 

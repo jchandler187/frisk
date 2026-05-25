@@ -19,10 +19,10 @@ RUN arch=$(uname -m) && \
     | tar -xz -C /usr/local/bin gitleaks
 
 # Create app user and dirs
-RUN useradd -m -s /bin/bash clawsec
-ENV CLAWSEC_HOME=/home/clawsec/.clawsec
-ENV CLAWSEC_INTEL_DIR=/home/clawsec/.clawsec/intel
-WORKDIR /home/clawsec/app
+RUN useradd -m -s /bin/bash frisk
+ENV FRISK_HOME=/home/frisk/.frisk
+ENV FRISK_INTEL_DIR=/home/frisk/.frisk/intel
+WORKDIR /home/frisk/app
 
 # Copy package files first for layer caching
 COPY package.json package-lock.json* ./
@@ -30,16 +30,16 @@ RUN npm install --production
 
 # Copy Python requirements
 COPY requirements.txt ./
-RUN python3 -m venv ${CLAWSEC_HOME}/venv && \
-    ${CLAWSEC_HOME}/venv/bin/pip install --quiet --upgrade pip && \
-    ${CLAWSEC_HOME}/venv/bin/pip install --quiet -r requirements.txt
+RUN python3 -m venv ${FRISK_HOME}/venv && \
+    ${FRISK_HOME}/venv/bin/pip install --quiet --upgrade pip && \
+    ${FRISK_HOME}/venv/bin/pip install --quiet -r requirements.txt
 
 # Copy application code
 COPY . .
 
 # Create data dirs
-RUN mkdir -p ${CLAWSEC_INTEL_DIR}/{cisa-kev,osv,epss,malwarebazaar,urlhaus,threatfox,feodo,yara-rules,semgrep-rules} \
-    ${CLAWSEC_HOME}/reports
+RUN mkdir -p ${FRISK_INTEL_DIR}/{cisa-kev,osv,epss,malwarebazaar,urlhaus,threatfox,feodo,yara-rules,semgrep-rules} \
+    ${FRISK_HOME}/reports
 
 # Expose API port
 EXPOSE 3100
@@ -49,5 +49,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD curl -fsSL http://localhost:3100/health || exit 1
 
 # Run API server
-USER clawsec
+USER frisk
 CMD ["node", "api/src/server.js"]

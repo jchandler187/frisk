@@ -7,7 +7,7 @@ source "$(dirname "$0")/../../common/colors.sh"
 source "$(dirname "$0")/../../common/log.sh"
 source "$(dirname "$0")/../../common/utils.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 TARGET="${INTEL_DIR}/threatfox/iocs.csv"
 URL="https://threatfox.abuse.ch/export/csv/recent/"
 MANIFEST_PY="$(dirname "$0")/../manifest.py"

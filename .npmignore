@@ -10,6 +10,6 @@ __pycache__/
 .env
 *.log
 *.tar.gz
-clawsec-api.service
-clawsec-sync.service
-clawsec-sync.timer
+frisk-api.service
+frisk-sync.service
+frisk-sync.timer

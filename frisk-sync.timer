@@ -1,5 +1,5 @@
 [Unit]
-Description=ClawSec Intel Sync Timer
+Description=Frisk Intel Sync Timer
 
 [Timer]
 OnCalendar=daily

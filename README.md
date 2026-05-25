@@ -1,4 +1,4 @@
-# ⚡ ClawSec
+# ⚡ Frisk
 
 Security verification tool that scans ClawHub skills against 9 continuously-updated threat intelligence sources using 7 autonomous security checks.
 
@@ -8,59 +8,59 @@ If you find it useful, [buy me a coffee](https://buymeacoffee.com/lowwattlabs) �
 
 ```bash
 # Install globally via npm
-npm install -g @lowwattlabs/clawsec
+npm install -g @lowwattlabs/frisk
 
 # Scan a local skill directory
-clawsec scan ./my-skill
+frisk scan ./my-skill
 
 # Scan with JSON output
-clawsec scan ./my-skill --json
+frisk scan ./my-skill --json
 
 # Sync threat intel
-clawsec sync
+frisk sync
 
 # Check intel cache status
-clawsec status
+frisk status
 ```
 
-First run automatically sets up a Python venv at `~/.clawsec/venv/` and installs dependencies. The first `clawsec sync` (or auto-sync) downloads approximately 50–100 MB of threat intel data.
+First run automatically sets up a Python venv at `~/.frisk/venv/` and installs dependencies. The first `frisk sync` (or auto-sync) downloads approximately 50–100 MB of threat intel data.
 
 ## Docker
 
 ```bash
 # Build
-docker build -t lowwattlabs/clawsec .
+docker build -t lowwattlabs/frisk .
 
 # Run
-docker run -p 3100:3100 -e CLAWSEC_HOST=0.0.0.0 lowwattlabs/clawsec
-> **Note:** The API server defaults to 127.0.0.1 (loopback only). Docker needs `CLAWSEC_HOST=0.0.0.0` to accept connections from outside the container.
+docker run -p 3100:3100 -e FRISK_HOST=0.0.0.0 lowwattlabs/frisk
+> **Note:** The API server defaults to 127.0.0.1 (loopback only). Docker needs `FRISK_HOST=0.0.0.0` to accept connections from outside the container.
 
 # Scan via API inside container
-docker run lowwattlabs/clawsec clawsec scan /path/to/skill
+docker run lowwattlabs/frisk frisk scan /path/to/skill
 ```
 
 ## CLI Usage
 
 ```bash
 # Verify a skill
-clawsec scan ./my-skill
-clawsec scan ./my-skill --json        # JSON output
-clawsec scan ./my-skill --checks=dep-scan,secret-scan  # Run specific checks
+frisk scan ./my-skill
+frisk scan ./my-skill --json        # JSON output
+frisk scan ./my-skill --checks=dep-scan,secret-scan  # Run specific checks
 
 # Scan by ClawHub slug
-clawsec scan my-awesome-skill
+frisk scan my-awesome-skill
 
 # Refresh intel cache
-clawsec sync                          # All sources
-clawsec sync cisa-kev epss            # Specific sources
+frisk sync                          # All sources
+frisk sync cisa-kev epss            # Specific sources
 
 # Check cache status
-clawsec status
-clawsec status --json                 # JSON output
+frisk status
+frisk status --json                 # JSON output
 
 # View saved report
-clawsec report abc12345
-clawsec report abc12345 --json        # JSON output
+frisk report abc12345
+frisk report abc12345 --json        # JSON output
 ```
 
 **Exit codes:** 0 = pass, 1 = warn, 2 = fail
@@ -71,13 +71,13 @@ clawsec report abc12345 --json        # JSON output
 
 ```bash
 # Via npm global install
-clawsec-api
+frisk-api
 
 # Or directly
 node api/src/server.js
 
 # With custom config
-CLAWSEC_HOME=~/.clawsec CLAWSEC_PORT=3100 clawsec-api
+FRISK_HOME=~/.frisk FRISK_PORT=3100 frisk-api
 ```
 
 ### API endpoints
@@ -135,36 +135,36 @@ curl http://localhost:3100/health
 | YARA Rules (Neo23x0) | Malware/signature detection | ~746 rules | Daily |
 | Semgrep Rules | Static analysis rules | ~2,183 rules | Daily |
 
-All data cached under `~/.clawsec/intel/` with atomic writes and graceful degradation on failure.
+All data cached under `~/.frisk/intel/` with atomic writes and graceful degradation on failure.
 
 ## Configuration
 
-ClawSec uses environment variables with sensible defaults:
+Frisk uses environment variables with sensible defaults:
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CLAWSEC_HOME` | `~/.clawsec` | Root directory for venv, intel, reports |
-| `CLAWSEC_INTEL_DIR` | `~/.clawsec/intel` | Intel cache directory |
-| `CLAWSEC_REPORTS_DIR` | `~/.clawsec/reports` | Reports directory |
-| `CLAWSEC_PORT` | `3100` | API server port |
+| `FRISK_HOME` | `~/.frisk` | Root directory for venv, intel, reports |
+| `FRISK_INTEL_DIR` | `~/.frisk/intel` | Intel cache directory |
+| `FRISK_REPORTS_DIR` | `~/.frisk/reports` | Reports directory |
+| `FRISK_PORT` | `3100` | API server port |
 
 ## Local Development
 
 ```bash
-git clone https://github.com/jchandler187/clawsec.git
-cd clawsec
+git clone https://github.com/jchandler187/frisk.git
+cd frisk
 ./setup.sh          # Installs system deps + Python venv
-clawsec sync        # Populate intel cache (first run takes a few minutes for OSV)
-clawsec scan ./path # Verify a skill
+frisk sync        # Populate intel cache (first run takes a few minutes for OSV)
+frisk scan ./path # Verify a skill
 ```
 
 ## Architecture
 
 ```
-clawsec/
+frisk/
 ├── bin/
-│   ├── clawsec.js       (CLI entry point)
-│   ├── clawsec-api.js   (API entry point)
+│   ├── frisk.js       (CLI entry point)
+│   ├── frisk-api.js   (API entry point)
 │   └── setup-venv.js    (postinstall venv setup)
 ├── api/
 │   └── src/
@@ -174,7 +174,7 @@ clawsec/
 │       ├── badge.js      (SVG trust badge generator)
 │       └── verify-wrapper.sh
 ├── cli/
-│   └── clawsec.py       (Python CLI)
+│   └── frisk.py       (Python CLI)
 ├── lib/
 │   ├── intel-sync/       (Intel cache synchronization)
 │   │   ├── sync.sh        (Main sync orchestrator)
@@ -192,7 +192,7 @@ clawsec/
 └── README.md
 ```
 
-## What ClawSec DOES Check
+## What Frisk DOES Check
 
 - **Known vulnerabilities in declared dependencies** (OSV + CISA KEV + EPSS)
 - **Static code patterns** — shell injection, eval, exec, path traversal, system writes (Semgrep + behavioral heuristics)
@@ -202,7 +202,7 @@ clawsec/
 - **Prompt injection attempts** — instruction overrides, role manipulation, jailbreak patterns in SKILL.md
 - **Large encoded payloads** — suspicious base64 blobs above 2KB that decode to binary content
 
-## What ClawSec Does NOT Check
+## What Frisk Does NOT Check
 
 - String concatenation obfuscation
 - Lazy-loaded payloads (partially caught via eval/evalSub)
@@ -217,7 +217,7 @@ clawsec/
 - **30+ days stale** → Warning (results may be outdated)
 - **90+ days stale** → Critical failure (results unreliable, resync required)
 
-Run `clawsec sync` to refresh stale intel sources.
+Run `frisk sync` to refresh stale intel sources.
 
 ## License
 

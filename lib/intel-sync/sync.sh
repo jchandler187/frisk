@@ -1,5 +1,5 @@
-# ⚡ Low Watt Labs — ClawSec Intel Sync
-# ClawSec v2 - Intel Sync Orchestrator
+# ⚡ Low Watt Labs — Frisk Intel Sync
+# Frisk v2 - Intel Sync Orchestrator
 # Runs all intel source sync jobs, gracefully handling failures
 set -euo pipefail
 
@@ -12,7 +12,7 @@ source "${SCRIPT_DIR}/../common/colors.sh"
 source "${SCRIPT_DIR}/../common/log.sh"
 
 usage() {
-    echo "ClawSec v${VERSION} — Intel Sync"
+    echo "Frisk v${VERSION} — Intel Sync"
     echo ""
     echo "Usage: sync.sh [OPTIONS] [SOURCE...]"
     echo ""
@@ -31,12 +31,12 @@ usage() {
 ALL_SOURCES=(cisa-kev osv epss malwarebazaar urlhaus threatfox feodo yara-rules semgrep-rules)
 
 # Ensure intel directories exist
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 for src in "${ALL_SOURCES[@]}"; do
     mkdir -p "${INTEL_DIR}/${src}"
 done
 mkdir -p "${INTEL_DIR}/osv/npm" "${INTEL_DIR}/osv/PyPI"
-mkdir -p "${CLAWSEC_REPORTS_DIR}" 
+mkdir -p "${FRISK_REPORTS_DIR}" 
 requested_sources=()
 json_output=0
 
@@ -68,7 +68,7 @@ done
 [[ ${#requested_sources[@]} -eq 0 ]] && requested_sources=("${ALL_SOURCES[@]}")
 
 echo -e "${BOLD}╔══════════════════════════════════════╗${RESET}"
-echo -e "${BOLD}║  ClawSec v${VERSION} — Intel Sync        ║${RESET}"
+echo -e "${BOLD}║  Frisk v${VERSION} — Intel Sync        ║${RESET}"
 echo -e "${BOLD}╚══════════════════════════════════════╝${RESET}"
 echo ""
 echo -e "  Syncing ${BOLD}${#requested_sources[@]}${RESET} source(s): ${CYAN}${requested_sources[*]}${RESET}"

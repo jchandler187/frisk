@@ -1,8 +1,8 @@
-# ⚡ Low Watt Labs — ClawSec
-# ClawSec v2 - Secret Scan (Gitleaks)
+# ⚡ Low Watt Labs — Frisk
+# Frisk v2 - Secret Scan (Gitleaks)
 #
 # SECURITY MANIFEST:
-# Environment variables accessed: CLAWSEC_HOME (via colors.sh, optional)
+# Environment variables accessed: FRISK_HOME (via colors.sh, optional)
 # External endpoints called: none
 # Local files read: skill_path (target directory being scanned)
 # Local files written: /tmp/gitleaks.XXXXXX.json (temporary, deleted after scan)

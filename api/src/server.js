@@ -1,5 +1,5 @@
 /**
- * ⚡ ClawSec v2 - Cloud API Server
+ * ⚡ Frisk v2 - Cloud API Server
  * Express-based security verification service
  */
 
@@ -12,9 +12,9 @@ const { RateLimiterMemory } = require('rate-limiter-flexible');
 const routes = require('./routes');
 const middleware = require('./middleware');
 
-const CLAWSEC_DIR = process.env.CLAWSEC_HOME || path.join(os.homedir(), '.clawsec');
-const REPORTS_DIR = process.env.CLAWSEC_REPORTS_DIR || path.join(CLAWSEC_DIR, 'reports');
-const PORT = process.env.CLAWSEC_PORT || 3100;
+const FRISK_DIR = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
+const REPORTS_DIR = process.env.FRISK_REPORTS_DIR || path.join(FRISK_DIR, 'reports');
+const PORT = process.env.FRISK_PORT || 3100;
 
 const app = express();
 
@@ -52,9 +52,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start
-const HOST = process.env.CLAWSEC_HOST || '127.0.0.1';
-// NOTE: For Docker, set CLAWSEC_HOST=0.0.0.0 to bind all interfaces
+const HOST = process.env.FRISK_HOST || '127.0.0.1';
+// NOTE: For Docker, set FRISK_HOST=0.0.0.0 to bind all interfaces
 app.listen(PORT, HOST, () => {
-    console.log(`⚡ ClawSec API v2.4.0 listening on ${HOST}:${PORT}`);
+    console.log(`⚡ Frisk API v2.4.0 listening on ${HOST}:${PORT}`);
     fs.mkdirSync(REPORTS_DIR, { recursive: true });
 });

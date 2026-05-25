@@ -1,5 +1,5 @@
 /**
- * ⚡ ClawSec v2 - API Middleware
+ * ⚡ Frisk v2 - API Middleware
  * Rate limiting, auth, request logging
  */
 
@@ -8,7 +8,7 @@ const path = require('path');
 const os = require('os');
 const fs = require('fs');
 
-const CLAWSEC_DIR = process.env.CLAWSEC_HOME || path.join(os.homedir(), '.clawsec');
+const FRISK_DIR = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
 
 // Rate limiter: 5 scans/day for free tier, much higher for API key holders
 const freeLimiter = new RateLimiterMemory({
@@ -25,7 +25,7 @@ const proLimiter = new RateLimiterMemory({
 
 // Load API keys from config
 function loadApiKeys() {
-    const keysFile = path.join(CLAWSEC_DIR, 'api', 'api-keys.json');
+    const keysFile = path.join(FRISK_DIR, 'api', 'api-keys.json');
     if (fs.existsSync(keysFile)) {
         try {
             return JSON.parse(fs.readFileSync(keysFile, 'utf8'));

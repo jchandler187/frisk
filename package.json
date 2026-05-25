@@ -1,10 +1,10 @@
 {
-  "name": "@lowwattlabs/clawsec",
-  "version": "2.5.0",
-  "description": "ClawSec - Security Verification for ClawHub Skills",
+  "name": "@lowwattlabs/frisk",
+  "version": "1.0.1",
+  "description": "\u26a1 Frisk \u2014 Local-first security scanner for ClawHub skills. 9 intel sources, 7 checks, zero phone-home.",
   "bin": {
-    "clawsec": "./bin/clawsec.js",
-    "clawsec-api": "./bin/clawsec-api.js"
+    "frisk": "./bin/frisk.js",
+    "frisk-api": "./bin/frisk-api.js"
   },
   "files": [
     "bin/",
@@ -28,7 +28,7 @@
   "license": "MIT-0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jchandler187/clawsec.git"
+    "url": "https://github.com/jchandler187/frisk.git"
   },
   "keywords": [
     "security",

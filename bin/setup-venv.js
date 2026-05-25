@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ⚡ ClawSec postinstall — sets up Python venv and runs initial intel sync
+ * ⚡ Frisk postinstall — sets up Python venv and runs initial intel sync
  * Called by npm postinstall. Safe to run multiple times.
  */
 
@@ -9,17 +9,17 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const CLAWSEC_HOME = process.env.CLAWSEC_HOME || path.join(os.homedir(), '.clawsec');
-const VENV_DIR = path.join(CLAWSEC_HOME, 'venv');
+const FRISK_HOME = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
+const VENV_DIR = path.join(FRISK_HOME, 'venv');
 const PYTHON = path.join(VENV_DIR, 'bin', 'python3');
-const INTEL_DIR = path.join(CLAWSEC_HOME, 'intel');
+const INTEL_DIR = path.join(FRISK_HOME, 'intel');
 
-// Don't fail install if setup fails — user can run clawsec setup later
+// Don't fail install if setup fails — user can run frisk setup later
 try {
   // Step 1: Create Python venv if needed
   if (!fs.existsSync(PYTHON)) {
-    fs.mkdirSync(CLAWSEC_HOME, { recursive: true });
-    console.log('⚡ Setting up ClawSec Python environment (first run)...');
+    fs.mkdirSync(FRISK_HOME, { recursive: true });
+    console.log('⚡ Setting up Frisk Python environment (first run)...');
     execSync(`python3 -m venv "${VENV_DIR}"`, { stdio: 'inherit' });
 
     const PKG_ROOT = path.resolve(__dirname, '..');
@@ -41,7 +41,7 @@ try {
   for (const d of intelDirs) {
     fs.mkdirSync(path.join(INTEL_DIR, d), { recursive: true });
   }
-  fs.mkdirSync(path.join(CLAWSEC_HOME, 'reports'), { recursive: true });
+  fs.mkdirSync(path.join(FRISK_HOME, 'reports'), { recursive: true });
 
   // Only sync if intel cache is empty (first install)
   const manifest = path.join(INTEL_DIR, 'manifest.json');
@@ -55,20 +55,20 @@ try {
           stdio: 'inherit',
           env: {
             ...process.env,
-            CLAWSEC_HOME: CLAWSEC_HOME,
-            CLAWSEC_INTEL_DIR: INTEL_DIR,
-            CLAWSEC_REPORTS_DIR: path.join(CLAWSEC_HOME, 'reports'),
+            FRISK_HOME: FRISK_HOME,
+            FRISK_INTEL_DIR: INTEL_DIR,
+            FRISK_REPORTS_DIR: path.join(FRISK_HOME, 'reports'),
             PATH: `${path.join(os.homedir(), '.local', 'bin')}:${process.env.PATH || '/usr/local/bin:/usr/bin:/bin'}`,
           }
         });
       } catch {
-        // Sync failure is non-fatal — user can run clawsec sync later
-        console.log('  ⚠ Intel sync had issues. Run "clawsec sync" to retry.');
+        // Sync failure is non-fatal — user can run frisk sync later
+        console.log('  ⚠ Intel sync had issues. Run "frisk sync" to retry.');
       }
     }
   }
 
-  console.log('⚡ ClawSec ready. Run "clawsec scan ./my-skill" to get started.');
+  console.log('⚡ Frisk ready. Run "frisk scan ./my-skill" to get started.');
 } catch {
   // Postinstall is best-effort. The CLI will try again on first run.
   process.exit(0);

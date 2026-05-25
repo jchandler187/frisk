@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ⚡ ClawSec API verification wrapper
+# ⚡ Frisk API verification wrapper
 # Activates venv and runs verify.sh --json
 set -euo pipefail
 
@@ -8,7 +8,7 @@ PKG_ROOT="$(cd "$(dirname "$0")"/../.. && pwd)"
 
 source "${PKG_ROOT}/lib/common/config.sh"
 
-VENV="${CLAWSEC_HOME}/venv"
+VENV="${FRISK_HOME}/venv"
 if [[ -d "$VENV" ]]; then
     source "$VENV/bin/activate"
 fi

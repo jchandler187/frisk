@@ -1,32 +1,32 @@
 /**
- * ClawSec v2 - SVG Badge Generator
+ * Frisk v2 - SVG Badge Generator
  */
 
 function generateBadge(verdict) {
     const configs = {
         pass: {
-            label: 'clawsec',
+            label: 'frisk',
             value: 'verified',
             labelColor: '#333',
             valueColor: '#2ea043',
             valueBorderColor: '#2ea04366'
         },
         warn: {
-            label: 'clawsec',
+            label: 'frisk',
             value: 'warnings',
             labelColor: '#333',
             valueColor: '#d29922',
             valueBorderColor: '#d2992266'
         },
         fail: {
-            label: 'clawsec',
+            label: 'frisk',
             value: 'failed',
             labelColor: '#333',
             valueColor: '#da3633',
             valueBorderColor: '#da363366'
         },
         unknown: {
-            label: 'clawsec',
+            label: 'frisk',
             value: 'unknown',
             labelColor: '#333',
             valueColor: '#6e7781',

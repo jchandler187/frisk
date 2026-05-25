@@ -1,14 +1,14 @@
 ---
-name: clawsec
+name: frisk
 description: "Scan ClawHub skills for security vulnerabilities before installing — 9 continuously-updated threat intel sources, 7 autonomous checks, instant slug scan."
-version: 2.4.0
+version: 1.0.1
 metadata:
   openclaw:
     emoji: "⚡"
-    homepage: https://github.com/jchandler187/clawsec
+    homepage: https://github.com/jchandler187/frisk
     requires:
       env:
-        - CLAWSEC_HOME
+        - FRISK_HOME
       bins:
         - python3
         - clawhub
@@ -16,36 +16,36 @@ metadata:
         - gitleaks
         - semgrep
         - yara
-    primaryEnv: CLAWSEC_HOME
+    primaryEnv: FRISK_HOME
     envVars:
-      - name: CLAWSEC_HOME
+      - name: FRISK_HOME
         required: false
-        description: "Base directory for intel cache and reports (default: ~/.clawsec)"
-      - name: CLAWSEC_INTEL_DIR
+        description: "Base directory for intel cache and reports (default: ~/.frisk)"
+      - name: FRISK_INTEL_DIR
         required: false
-        description: "Override intel cache directory (default: CLAWSEC_HOME/intel)"
-      - name: CLAWSEC_REPORTS_DIR
+        description: "Override intel cache directory (default: FRISK_HOME/intel)"
+      - name: FRISK_REPORTS_DIR
         required: false
-        description: "Override reports directory (default: CLAWSEC_HOME/reports)"
+        description: "Override reports directory (default: FRISK_HOME/reports)"
     install:
       - kind: node
-        package: "@lowwattlabs/clawsec"
+        package: "@lowwattlabs/frisk"
         bins:
-          - clawsec
+          - frisk
 ---
 
-# ⚡ ClawSec
+# ⚡ Frisk
 
 Security verification for ClawHub skills. Scan any skill — by local path or ClawHub slug — against 9 continuously-updated threat intelligence sources using 7 autonomous security checks.
 
 ## What it does
 
-ClawSec scans a skill directory for security issues before you install it. It checks dependencies against known vulnerability databases, scans for hardcoded secrets, detects indicators of compromise, and looks for prompt injection vectors — all without sending your data anywhere.
+Frisk scans a skill directory for security issues before you install it. It checks dependencies against known vulnerability databases, scans for hardcoded secrets, detects indicators of compromise, and looks for prompt injection vectors — all without sending your data anywhere.
 
 **One command to scan any ClawHub skill:**
 
 ```
-clawsec scan weather-forecast
+frisk scan weather-forecast
 ```
 
 That downloads the skill from ClawHub, scans it, shows results, and cleans up. No manual steps.
@@ -53,12 +53,12 @@ That downloads the skill from ClawHub, scans it, shows results, and cleans up. N
 **Or scan a local skill directory:**
 
 ```
-clawsec scan ./my-skill
+frisk scan ./my-skill
 ```
 
 ## When to use this skill
 
-Use ClawSec when you are about to install a skill from ClawHub and want to verify it is safe. Also use it when developing your own skills — run a scan before publishing to catch issues early.
+Use Frisk when you are about to install a skill from ClawHub and want to verify it is safe. Also use it when developing your own skills — run a scan before publishing to catch issues early.
 
 ## Parameters
 
@@ -68,11 +68,11 @@ Use ClawSec when you are about to install a skill from ClawHub and want to verif
 
 ## Return value
 
-ClawSec outputs a structured report with:
+Frisk outputs a structured report with:
 
 - **verdict** — `pass`, `warn`, or `fail`
 - **findings** — Array of issues found, each with severity (`critical`, `high`, `medium`), description, and file location
-- **report_id** — Short ID for later retrieval via `clawsec report <id>`
+- **report_id** — Short ID for later retrieval via `frisk report <id>`
 
 Exit codes: 0 = pass, 1 = warn, 2 = fail
 
@@ -92,17 +92,17 @@ Exit codes: 0 = pass, 1 = warn, 2 = fail
 
 CISA KEV · OSV (npm + PyPI) · EPSS · MalwareBazaar · URLhaus · ThreatFox · Feodo Tracker · YARA Rules · Semgrep Rules
 
-Run `clawsec sync` to refresh the intel cache.
+Run `frisk sync` to refresh the intel cache.
 
 ## Security & Privacy
 
 - **No data leaves your machine.** All scanning happens locally. No telemetry, no phone-home, no analytics.
 - **Downloaded skills are sandboxed.** When scanning by slug, the skill is downloaded to a 0700-permission temp directory, all files have execute permissions stripped before scanning, and npm postinstall scripts are suppressed. The skill is deleted after scanning.
-- **Credentials stay local.** ClawSec reads environment variables for configuration but never transmits them.
+- **Credentials stay local.** Frisk reads environment variables for configuration but never transmits them.
 
 ### External endpoints
 
-ClawSec downloads threat intel feeds from these public sources during `clawsec sync`:
+Frisk downloads threat intel feeds from these public sources during `frisk sync`:
 
 | Source | URL | Data sent |
 |--------|-----|-----------|
@@ -116,37 +116,37 @@ ClawSec downloads threat intel feeds from these public sources during `clawsec s
 | YARA Rules | https://github.com/Yara-Rules/rules.git | None (git clone) |
 | Semgrep Rules | https://github.com/returntocorp/semgrep-rules.git | None (git clone) |
 
-During `clawsec scan`, no network requests are made. All intel is local.
+During `frisk scan`, no network requests are made. All intel is local.
 
 ### Local files read
 
-- `~/.clawsec/intel/` — Threat intel cache
+- `~/.frisk/intel/` — Threat intel cache
 - Skill directory passed as scan target
 
 ### Local files written
 
-- `~/.clawsec/intel/` — Synced threat intel data
-- `~/.clawsec/reports/` — Scan reports (JSON)
-- `~/.clawsec/venv/` — Python virtual environment for scan checks
-- `~/.clawsec/clawsec.log` — Scan log output
+- `~/.frisk/intel/` — Synced threat intel data
+- `~/.frisk/reports/` — Scan reports (JSON)
+- `~/.frisk/venv/` — Python virtual environment for scan checks
+- `~/.frisk/frisk.log` — Scan log output
 
 ### Trust statement
 
-By using ClawSec, you trust the threat intel sources listed above to provide accurate vulnerability and IOC data. No skill code or scan targets are transmitted to any external service. Install it only if you trust the Low Watt Labs project and the listed intel sources.
+By using Frisk, you trust the threat intel sources listed above to provide accurate vulnerability and IOC data. No skill code or scan targets are transmitted to any external service. Install it only if you trust the Low Watt Labs project and the listed intel sources.
 
 ## Install
 
 ```bash
-npm install -g @lowwattlabs/clawsec
+npm install -g @lowwattlabs/frisk
 ```
 
-First run automatically creates a Python venv and syncs threat intel. After that, `clawsec scan` works with zero configuration.
+First run automatically creates a Python venv and syncs threat intel. After that, `frisk scan` works with zero configuration.
 
 ## Docker
 
 ```bash
-docker build -t lowwattlabs/clawsec .
-docker run -p 3100:3100 lowwattlabs/clawsec
+docker build -t lowwattlabs/frisk .
+docker run -p 3100:3100 lowwattlabs/frisk
 ```
 
 ## Pricing

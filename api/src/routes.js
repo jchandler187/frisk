@@ -1,5 +1,5 @@
 /**
- * ⚡ ClawSec v2 - API Routes
+ * ⚡ Frisk v2 - API Routes
  */
 
 const express = require('express');
@@ -11,9 +11,9 @@ const { v4: uuidv4 } = require('uuid');
 const { generateBadge } = require('./badge');
 
 const router = express.Router();
-const CLAWSEC_DIR = process.env.CLAWSEC_HOME || path.join(os.homedir(), '.clawsec');
-const REPORTS_DIR = process.env.CLAWSEC_REPORTS_DIR || path.join(CLAWSEC_DIR, 'reports');
-const INTEL_DIR = process.env.CLAWSEC_INTEL_DIR || path.join(CLAWSEC_DIR, 'intel');
+const FRISK_DIR = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
+const REPORTS_DIR = process.env.FRISK_REPORTS_DIR || path.join(FRISK_DIR, 'reports');
+const INTEL_DIR = process.env.FRISK_INTEL_DIR || path.join(FRISK_DIR, 'intel');
 
 // Validate id param: alphanumeric + hyphens only, max 128 chars
 function sanitizeId(id) {
@@ -50,7 +50,7 @@ function hardenSkillDir(dir) {
 // Create a restricted temp directory for skill downloads.
 // Returns the path to the temp dir.
 function createScanTempDir() {
-    const tmpDir = path.join(os.tmpdir(), 'clawsec-scan-' + uuidv4());
+    const tmpDir = path.join(os.tmpdir(), 'frisk-scan-' + uuidv4());
     fs.mkdirSync(tmpDir, { recursive: true, mode: 0o700 });
     return tmpDir;
 }
@@ -135,7 +135,7 @@ router.post('/scan', (req, res) => {
             return res.status(400).json({ error: 'Could not resolve skill target' });
         }
 
-        // Run verification — resolve from package root, not CLAWSEC_DIR
+        // Run verification — resolve from package root, not FRISK_DIR
         const verifyWrapper = path.join(__dirname, 'verify-wrapper.sh');
         let result;
         try {
@@ -176,7 +176,7 @@ router.post('/scan', (req, res) => {
             try { fs.rmSync(targetDir, { recursive: true }); } catch {}
             // Also try cleaning parent if it's a scan temp dir
             const parentDir = path.dirname(targetDir);
-            if (parentDir.includes('clawsec-scan-')) {
+            if (parentDir.includes('frisk-scan-')) {
                 try { fs.rmSync(parentDir, { recursive: true }); } catch {}
             }
         }

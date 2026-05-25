@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ClawSec Intel Manifest Manager
+"""Frisk Intel Manifest Manager
 
 Manages {INTEL_DIR}/manifest.json — tracks source sync status.
 """

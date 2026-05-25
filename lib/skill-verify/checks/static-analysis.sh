@@ -1,8 +1,8 @@
-# ⚡ Low Watt Labs — ClawSec
-# ClawSec v2 - Static Analysis (Semgrep)
+# ⚡ Low Watt Labs — Frisk
+# Frisk v2 - Static Analysis (Semgrep)
 #
 # SECURITY MANIFEST:
-# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config.sh)
+# Environment variables accessed: FRISK_HOME, FRISK_INTEL_DIR (via config.sh)
 # External endpoints called: none
 # Local files read: skill_path (target directory), semgrep rules from intel cache
 # Local files written: /tmp/semgrep.XXXXXX.json (temporary, deleted after scan)
@@ -11,7 +11,7 @@ set -euo pipefail
 source "$(dirname "$0")/../../common/config.sh"
 source "$(dirname "$0")/../../common/colors.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 SEMRULES_DIR="${INTEL_DIR}/semgrep-rules/repo"
 
 skill_path="${1:?Usage: static-analysis.sh <skill_path>}"
@@ -74,7 +74,7 @@ if jq empty "$tmpout" 2>/dev/null; then
             ]
         ')
         
-        # Map Semgrep severity to ClawSec scale: ERROR→high, WARNING→medium, INFO→low
+        # Map Semgrep severity to Frisk scale: ERROR→high, WARNING→medium, INFO→low
         results=$(echo "$results" | jq '
             .findings = [.findings[] |
                 if .severity == "ERROR" then .severity = "high"
@@ -84,7 +84,7 @@ if jq empty "$tmpout" 2>/dev/null; then
             ]
         ]')
 
-        # Recount by ClawSec severity
+        # Recount by Frisk severity
         crit=$(echo "$results" | jq '[.findings[] | select(.severity == "high" or .severity == "critical")] | length')
         warn=$(echo "$results" | jq '[.findings[] | select(.severity == "medium")] | length')
         info=$(echo "$results" | jq '[.findings[] | select(.severity == "low")] | length')

@@ -1,8 +1,8 @@
-# ⚡ Low Watt Labs — ClawSec
-# ClawSec v2 - YARA Scan
+# ⚡ Low Watt Labs — Frisk
+# Frisk v2 - YARA Scan
 #
 # SECURITY MANIFEST:
-# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR (via config.sh)
+# Environment variables accessed: FRISK_HOME, FRISK_INTEL_DIR (via config.sh)
 # External endpoints called: none
 # Local files read: skill_path (target directory), YARA rules from intel cache
 # Local files written: /tmp/yara-compiled.XXXXXX, /tmp/yara-combined.XXXXXX.yar, /tmp/yara-scan.XXXXXX (all temporary, deleted after scan)
@@ -11,7 +11,7 @@ set -euo pipefail
 source "$(dirname "$0")/../../common/config.sh"
 source "$(dirname "$0")/../../common/colors.sh"
 
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 YARA_RULES_DIR="${INTEL_DIR}/yara-rules/repo/yara"
 
 skill_path="${1:?Usage: yara-scan.sh <skill_path>}"

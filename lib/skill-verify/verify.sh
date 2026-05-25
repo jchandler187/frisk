@@ -1,12 +1,12 @@
-# ⚡ Low Watt Labs — ClawSec Skill Verify Orchestrator
-# ClawSec v2 - Skill Verify Orchestrator
+# ⚡ Low Watt Labs — Frisk Skill Verify Orchestrator
+# Frisk v2 - Skill Verify Orchestrator
 # Runs all 7 security checks against a skill, produces JSON report
 #
 # SECURITY MANIFEST:
-# Environment variables accessed: CLAWSEC_HOME, CLAWSEC_INTEL_DIR, CLAWSEC_REPORTS_DIR (via config.sh)
+# Environment variables accessed: FRISK_HOME, FRISK_INTEL_DIR, FRISK_REPORTS_DIR (via config.sh)
 # External endpoints called: none
 # Local files read: skill_path (target directory)
-# Local files written: TMPDIR/clawsec-results.XXXXXX.json (temporary, deleted after scan)
+# Local files written: TMPDIR/frisk-results.XXXXXX.json (temporary, deleted after scan)
 #
 set -euo pipefail
 
@@ -19,13 +19,13 @@ source "${SCRIPT_DIR}/../common/colors.sh"
 source "${SCRIPT_DIR}/../common/log.sh"
 
 # Activate Python venv if available
-VENV="${CLAWSEC_HOME}/venv"
+VENV="${FRISK_HOME}/venv"
 if [[ -d "$VENV" ]]; then
     source "$VENV/bin/activate"
 fi
 
 usage() {
-    echo "⚡ ClawSec v${VERSION} — Skill Verification"
+    echo "⚡ Frisk v${VERSION} — Skill Verification"
     echo ""
     echo "Usage: verify.sh [OPTIONS] <skill_path>"
     echo ""
@@ -75,7 +75,7 @@ fi
 skill_path="$(cd "$(dirname "$skill_path")" 2>/dev/null && pwd)/$(basename "$skill_path")" || skill_path="$(realpath "$skill_path")"
 
 # P0-4: Validate intel cache before running any checks
-INTEL_DIR="${CLAWSEC_INTEL_DIR}"
+INTEL_DIR="${FRISK_INTEL_DIR}"
 MANIFEST_JSON="${INTEL_DIR}/manifest.json"
 intel_missing=0
 intel_errors=()
@@ -184,7 +184,7 @@ fi
 
 if [[ $json_only -eq 0 ]]; then
     echo -e "${BOLD}⚡═══════════════════════════════════════════⚡${RESET}"
-    echo -e "${BOLD}⚡   ClawSec v${VERSION} — Skill Verification     ⚡${RESET}"
+    echo -e "${BOLD}⚡   Frisk v${VERSION} — Skill Verification     ⚡${RESET}"
     echo -e "${BOLD}⚡═══════════════════════════════════════════⚡${RESET}"
     echo ""
     echo -e "  Target: ${CYAN}${skill_path}${RESET}"
@@ -267,7 +267,7 @@ end_time=$(date +%s%N)
 elapsed_ms=$(( (end_time - start_time) / 1000000 ))
 
 # Generate report via safe temp file approach
-results_tmpfile=$(mktemp ${TMPDIR:-/tmp}/clawsec-results.XXXXXX.json)
+results_tmpfile=$(mktemp ${TMPDIR:-/tmp}/frisk-results.XXXXXX.json)
 trap "rm -f $results_tmpfile" EXIT INT TERM
 echo "$check_results" > "$results_tmpfile"
 
