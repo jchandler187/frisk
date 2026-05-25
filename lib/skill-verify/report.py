@@ -70,7 +70,7 @@ def generate_report(skill_path, check_results, scan_duration_ms=None):
     report = {
         "report_id": report_id,
         "schema_version": "2.0.0",
-        "version": "3.0.1",
+        "version": "3.0.2",
         "timestamp": now,
         "skill_path": skill_path,
         "verdict": verdict,

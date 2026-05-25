@@ -30,3 +30,9 @@ Initial unified release. Frisk consolidates the former ClawSec/SafeInstall proje
 - SKILL.md version aligned with npm package (3.0.1)
 - GitHub repo fully renamed — all ClawSec references replaced with Frisk
 - One product, one name: Frisk everywhere (GitHub, npm, ClawHub)
+
+## v3.0.2 (2026-05-25)
+- Audit fixes: all P0 issues resolved
+- Removed stale .bak file and __pycache__ from repo/tarball
+- Added *.bak, __pycache__/, frisk-temp/ to .npmignore
+- All version strings unified to 3.0.2
