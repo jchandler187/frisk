@@ -25,3 +25,8 @@ Initial unified release. Frisk consolidates the former ClawSec/SafeInstall proje
 - Config dirs: ~/.frisk/ (formerly ~/.clawsec/)
 - GitHub repo moved to jchandler187/frisk
 - SKILL.md aligned with actual package and binary names
+
+## v3.0.1 (2026-05-25)
+- SKILL.md version aligned with npm package (3.0.1)
+- GitHub repo fully renamed — all ClawSec references replaced with Frisk
+- One product, one name: Frisk everywhere (GitHub, npm, ClawHub)

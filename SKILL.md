@@ -1,7 +1,7 @@
 ---
 name: frisk
 description: "Scan ClawHub skills for security vulnerabilities before installing — 9 continuously-updated threat intel sources, 7 autonomous checks, instant slug scan."
-version: 1.0.1
+version: 3.0.1
 metadata:
   openclaw:
     emoji: "⚡"
