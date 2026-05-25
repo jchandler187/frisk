@@ -8,4 +8,5 @@ __pycache__/
 *.pyc
 .env
 intel/
-.DS_Store
+.DS_Storefrisk-temp/
+.bak

@@ -15,10 +15,15 @@ from config import FRISK_HOME, INTEL_DIR
 
 REPORTS_DIR = os.path.join(FRISK_HOME, "reports")
 
-def generate_report(skill_path, check_results):
+def generate_report(skill_path, check_results, scan_duration_ms=None):
     """Generate a final report from all check results."""
     report_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
+    
+    # Sanitize skill_path for slug scans: strip temp directory prefix
+    import re
+    if skill_path and re.match(r'^/home/[^/]+/tmp/frisk-scan-[a-zA-Z0-9_]+/', skill_path):
+        skill_path = skill_path.rsplit('/', 1)[-1]
 
     # Aggregate findings
     all_findings = []
@@ -65,6 +70,7 @@ def generate_report(skill_path, check_results):
     report = {
         "report_id": report_id,
         "schema_version": "2.0.0",
+        "version": "3.0.1",
         "timestamp": now,
         "skill_path": skill_path,
         "verdict": verdict,
@@ -78,6 +84,10 @@ def generate_report(skill_path, check_results):
         "checks": check_results,
         "intel_cache": get_cache_timestamps(),
     }
+    
+    # Include scan duration if provided
+    if scan_duration_ms is not None:
+        report["scan_duration_ms"] = scan_duration_ms
 
     # Save report
     os.makedirs(REPORTS_DIR, exist_ok=True)

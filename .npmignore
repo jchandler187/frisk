@@ -13,3 +13,6 @@ __pycache__/
 frisk-api.service
 frisk-sync.service
 frisk-sync.timer
+# Audit cleanup
+*.bak
+__pycache__/

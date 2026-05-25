@@ -82,7 +82,7 @@ if jq empty "$tmpout" 2>/dev/null; then
                 elif .severity == "INFO" then .severity = "low"
                 else . end
             ]
-        ]')
+        ')
 
         # Recount by Frisk severity
         crit=$(echo "$results" | jq '[.findings[] | select(.severity == "high" or .severity == "critical")] | length')
