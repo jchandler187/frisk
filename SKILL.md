@@ -1,37 +1,36 @@
 ---
 name: frisk
-description: "Catch leaked credentials and supply-chain threats in ClawHub skills before you install — 9 intel sources, 7 checks, credential leak detection, instant slug scan."
+description: "Catch leaked credentials and supply-chain threats in ClawHub skills\
+  \ before you install \u2014 9 intel sources, 7 checks, credential leak detection,\
+  \ instant slug scan."
 version: 3.1.0
 metadata:
   openclaw:
-    emoji: "⚡"
+    emoji: "\u26A1"
     homepage: https://github.com/jchandler187/frisk
     requires:
-      env:
-        - FRISK_HOME
       bins:
-        - python3
-        - clawhub
+      - python3
+      - clawhub
       anyBins:
-        - gitleaks
-        - semgrep
-        - yara
-    primaryEnv: FRISK_HOME
+      - gitleaks
+      - semgrep
+      - yara
     envVars:
-      - name: FRISK_HOME
-        required: false
-        description: "Base directory for intel cache and reports (default: ~/.frisk)"
-      - name: FRISK_INTEL_DIR
-        required: false
-        description: "Override intel cache directory (default: FRISK_HOME/intel)"
-      - name: FRISK_REPORTS_DIR
-        required: false
-        description: "Override reports directory (default: FRISK_HOME/reports)"
+    - name: FRISK_HOME
+      required: false
+      description: 'Base directory for intel cache and reports (default: ~/.frisk)'
+    - name: FRISK_INTEL_DIR
+      required: false
+      description: 'Override intel cache directory (default: FRISK_HOME/intel)'
+    - name: FRISK_REPORTS_DIR
+      required: false
+      description: 'Override reports directory (default: FRISK_HOME/reports)'
     install:
-      - kind: node
-        package: "@lowwattlabs/frisk"
-        bins:
-          - frisk
+    - kind: node
+      package: '@lowwattlabs/frisk'
+      bins:
+      - frisk
 ---
 
 # ⚡ Frisk
