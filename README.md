@@ -1,8 +1,20 @@
 # ⚡ Frisk
 
-Security verification tool that scans ClawHub skills against 9 continuously-updated threat intelligence sources using 7 autonomous security checks.
+**Your `npm install` just handed someone your AWS keys.** Frisk catches it.
+
+Credential theft is the #1 attack vector in the AI agent supply chain. OpenAI Codex tokens, Red Hat npm packages, TanStack — all stolen through compromised dependencies. The perimeter doesn't matter when the credentials are already inside.
+
+Frisk scans ClawHub skills against 9 threat intel sources with 7 autonomous security checks. It catches leaked API keys, credential patterns, malware signatures, shell injection, and prompt injection — before you install.
 
 If you find it useful, [buy me a coffee](https://buymeacoffee.com/lowwattlabs) ⚡
+
+## Why Frisk exists
+
+Semantic guardrails are vibes. Frisk is proof.
+
+Most agent security today tries to detect bad intent through embeddings and heuristics — hoping the distance between "help me" and "exploit this" is wide enough. It never is. When an agent gains the ability to execute a tool or modify a file, the conversation is over. The only thing that matters is whether the operation carries a real threat.
+
+Frisk doesn't guess intent. It matches signatures. 2,371 malicious skills were found on ClawHub in 2026. 820+ in a single sweep. Someone has to check before you install. That's what this does.
 
 ## Quick Start
 
@@ -115,7 +127,7 @@ curl http://localhost:3100/health
 
 1. **Dependency Scan** — Matches declared dependencies against OSV, flags CISA KEV as critical, ranks by EPSS probability
 2. **Static Analysis** — Semgrep with community rules for code vulnerabilities
-3. **Secret Scan** — Gitleaks for leaked API keys, tokens, credentials
+3. **Credential Leak Scan** — Gitleaks for leaked API keys, tokens, credentials. Supplements with heuristic matching for AWS access keys (`AKIA...`), GitHub tokens (`ghp_/gho_/ghs_...`), Stripe keys (`sk_live/pk_live_...`), and Slack tokens (`xoxb-/xoxp-...`). Real or example — if a credential pattern ships in your skill, that's a problem.
 4. **YARA Scan** — Neo23x0 signature-base rules for malware/packer/suspicious patterns
 5. **IOC Match** — Extracts URLs/IPs/domains/hashes, matches against URLhaus/ThreatFox/Feodo/MalwareBazaar
 6. **Behavioral Heuristics** — Flags shell injection, system writes, fetch-exec, large base64 payloads, capability overreach
@@ -137,12 +149,45 @@ curl http://localhost:3100/health
 
 All data cached under `~/.frisk/intel/` with atomic writes and graceful degradation on failure.
 
+## The credential theft problem
+
+Every major supply chain attack in 2026 was a credential problem, not a perimeter problem:
+
+- **OpenAI Codex** — npm packages stole authentication tokens from developer environments
+- **Red Hat** — Miasma attack compromised npm packages through credential harvesting
+- **TanStack** — 35,000+ incidents from compromised dependencies
+- **Lithuanian Registry** — 600K records stolen via info-stealer on an authorized user's machine
+
+The common thread: valid credentials in the wrong hands. The system saw a legitimate login. It didn't see a thief.
+
+Frisk's credential leak scan catches this at the source. If a skill ships with hardcoded AWS keys, GitHub tokens, Stripe secrets, or Slack tokens — even example keys — that's a credential waiting to be swapped for a real one. Frisk flags it before you install.
+
+## What Frisk DOES Check
+
+- **Leaked secrets and credentials** — API keys, tokens, passwords, credential patterns (Gitleaks + heuristic matching)
+- **Known vulnerabilities in declared dependencies** (OSV + CISA KEV + EPSS)
+- **Static code patterns** — shell injection, eval, exec, path traversal, system writes (Semgrep + behavioral heuristics)
+- **Known malware signatures** — YARA rules matching packers, ransomware, suspicious binaries
+- **Threat intel IOC matches** — URLs, IPs, domains, and hashes from URLhaus, ThreatFox, Feodo, MalwareBazaar
+- **Prompt injection attempts** — instruction overrides, role manipulation, jailbreak patterns in SKILL.md
+- **Large encoded payloads** — suspicious base64 blobs above 2KB that decode to binary content
+
+## What Frisk Does NOT Check
+
+- String concatenation obfuscation
+- Lazy-loaded payloads (partially caught via eval/evalSub)
+- Conditional/time-bomb behavior
+- Dependency confusion/typo squatting
+- Runtime behavior (requires dynamic analysis)
+- Transitive vulnerabilities
+- Novel/zero-day threats not in any feed
+
 ## Configuration
 
 Frisk uses environment variables with sensible defaults:
 
 | Variable | Default | Description |
-|----------|---------|-------------|
+|----------|---------|-----------|
 | `FRISK_HOME` | `~/.frisk` | Root directory for venv, intel, reports |
 | `FRISK_INTEL_DIR` | `~/.frisk/intel` | Intel cache directory |
 | `FRISK_REPORTS_DIR` | `~/.frisk/reports` | Reports directory |
@@ -192,26 +237,6 @@ frisk/
 └── README.md
 ```
 
-## What Frisk DOES Check
-
-- **Known vulnerabilities in declared dependencies** (OSV + CISA KEV + EPSS)
-- **Static code patterns** — shell injection, eval, exec, path traversal, system writes (Semgrep + behavioral heuristics)
-- **Leaked secrets and credentials** — API keys, tokens, passwords (Gitleaks)
-- **Known malware signatures** — YARA rules matching packers, ransomware, suspicious binaries
-- **Threat intel IOC matches** — URLs, IPs, domains, and hashes from URLhaus, ThreatFox, Feodo, MalwareBazaar
-- **Prompt injection attempts** — instruction overrides, role manipulation, jailbreak patterns in SKILL.md
-- **Large encoded payloads** — suspicious base64 blobs above 2KB that decode to binary content
-
-## What Frisk Does NOT Check
-
-- String concatenation obfuscation
-- Lazy-loaded payloads (partially caught via eval/evalSub)
-- Conditional/time-bomb behavior
-- Dependency confusion/typo squatting
-- Runtime behavior (requires dynamic analysis)
-- Transitive vulnerabilities
-- Novel/zero-day threats not in any feed
-
 ## Intel Cache Staleness
 
 - **30+ days stale** → Warning (results may be outdated)
@@ -222,4 +247,3 @@ Run `frisk sync` to refresh stale intel sources.
 ## License
 
 MIT-0 — Low Watt Labs ⚡
-
