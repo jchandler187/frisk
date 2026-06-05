@@ -1,7 +1,7 @@
 ---
 name: frisk
-description: "Scan ClawHub skills for security vulnerabilities before installing — 9 continuously-updated threat intel sources, 7 autonomous checks, instant slug scan."
-version: 3.0.3
+description: "Catch leaked credentials and supply-chain threats in ClawHub skills before you install — 9 intel sources, 7 checks, credential leak detection, instant slug scan."
+version: 3.1.0
 metadata:
   openclaw:
     emoji: "⚡"
@@ -36,11 +36,15 @@ metadata:
 
 # ⚡ Frisk
 
-Security verification for ClawHub skills. Scan any skill — by local path or ClawHub slug — against 9 continuously-updated threat intelligence sources using 7 autonomous security checks.
+**Your `npm install` just handed someone your AWS keys.** Frisk catches it.
+
+Credential theft is the #1 attack vector in the AI agent supply chain. OpenAI Codex tokens, Red Hat npm packages, TanStack — all stolen through compromised dependencies. The perimeter doesn't matter when the credentials are already inside.
+
+Frisk scans ClawHub skills against 9 threat intel sources with 7 autonomous security checks. It catches leaked API keys, credential patterns, malware signatures, shell injection, and prompt injection — before you install.
 
 ## What it does
 
-Frisk scans a skill directory for security issues before you install it. It checks dependencies against known vulnerability databases, scans for hardcoded secrets, detects indicators of compromise, and looks for prompt injection vectors — all without sending your data anywhere.
+Frisk scans a skill directory for security issues before you install it. It checks for leaked credentials, matches dependencies against known vulnerability databases, detects indicators of compromise, and looks for prompt injection vectors — all without sending your data anywhere.
 
 **One command to scan any ClawHub skill:**
 
@@ -82,11 +86,22 @@ Exit codes: 0 = pass, 1 = warn, 2 = fail
 |-------|-------------|
 | dep-scan | Cross-references dependencies against CISA KEV and OSV databases |
 | static-analysis | Runs Semgrep rules for security anti-patterns |
-| secret-scan | Scans for hardcoded API keys, tokens, and credentials using Gitleaks |
+| secret-scan | Scans for leaked API keys, tokens, and credential patterns using Gitleaks + heuristic matching (AWS keys, GitHub tokens, Stripe keys, Slack tokens). Real or example — if a credential pattern ships in your skill, that's a problem. |
 | yara-scan | Matches files against YARA rules for malware patterns |
 | ioc-match | Matches IPs, domains, URLs, and file hashes against ThreatFox, URLhaus, MalwareBazaar, and Feodo trackers |
 | behavioral | Detects suspicious patterns: eval usage, shell injection, data exfiltration vectors, DNS tunneling |
 | prompt-inject | Detects prompt injection and instruction-hiding patterns in SKILL.md |
+
+## The credential theft problem
+
+Every major supply chain attack in 2026 was a credential problem, not a perimeter problem:
+
+- **OpenAI Codex** — npm packages stole authentication tokens from developer environments
+- **Red Hat** — Miasma attack compromised npm packages through credential harvesting
+- **TanStack** — 35,000+ incidents from compromised dependencies
+- **Lithuanian Registry** — 600K records stolen via info-stealer on an authorized user's machine
+
+Frisk's credential leak scan catches this at the source. If a skill ships with hardcoded AWS keys, GitHub tokens, Stripe secrets, or Slack tokens — even example keys — that's a credential waiting to be swapped for a real one. Frisk flags it before you install.
 
 ## Threat intel sources (9, continuously synced)
 
