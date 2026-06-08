@@ -147,7 +147,7 @@ Or let OpenClaw install it via the skill install spec above.
 ## Also by Low Watt Labs
 
 - **🪙 HOARD** — Durable agent memory that survives session resets. [GitHub](https://github.com/lowwattlabs/hoard) · [npm](https://npmjs.com/package/@lowwattlabs/hoard) · [ClawHub](https://clawhub.ai/lowwattlabs/hoard)
-- **⚡ LFIT** — Local HD image generation on your hardware. Free, private, zero API keys. [GitHub](https://github.com/lowwattlabs/lfit) · [npm](https://npmjs.com/package/@lowwattlabs/lfit) · [ClawHub](https://clawhub.ai/lowwattlabs/lfit)
+- **⚡ LFIT** — Local HD image generation on your hardware. Free, private, zero API keys. [GitHub](https://github.com/lowwattlabs/lfit) · [npm](https://npmjs.com/package/@lowwattlabs/lfit) · [ClawHub](https://clawhub.ai/lowwattlabs/vulkan-lfit)
 
 ## License
 
