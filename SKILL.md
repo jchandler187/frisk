@@ -5,7 +5,7 @@ version: 3.1.2
 metadata:
   openclaw:
     emoji: "⚡"
-    homepage: https://github.com/jchandler187/frisk
+    homepage: https://github.com/lowwattlabs/frisk
     requires:
       bins:
         - python3
@@ -146,8 +146,8 @@ Or let OpenClaw install it via the skill install spec above.
 
 ## Also by Low Watt Labs
 
-- **🪙 HOARD** — Durable agent memory that survives session resets. [GitHub](https://github.com/jchandler187/hoard) · [npm](https://npmjs.com/package/@lowwattlabs/hoard) · [ClawHub](https://clawhub.ai/jchandler187/hoard)
-- **⚡ LFIT** — Local HD image generation on your hardware. Free, private, zero API keys. [GitHub](https://github.com/jchandler187/lfit) · [npm](https://npmjs.com/package/@lowwattlabs/lfit) · [ClawHub](https://clawhub.ai/jchandler187/lfit)
+- **🪙 HOARD** — Durable agent memory that survives session resets. [GitHub](https://github.com/lowwattlabs/hoard) · [npm](https://npmjs.com/package/@lowwattlabs/hoard) · [ClawHub](https://clawhub.ai/lowwattlabs/hoard)
+- **⚡ LFIT** — Local HD image generation on your hardware. Free, private, zero API keys. [GitHub](https://github.com/lowwattlabs/lfit) · [npm](https://npmjs.com/package/@lowwattlabs/lfit) · [ClawHub](https://clawhub.ai/lowwattlabs/lfit)
 
 ## License
 

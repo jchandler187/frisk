@@ -23,7 +23,7 @@ Initial unified release. Frisk consolidates the former ClawSec/SafeInstall proje
 - Renamed package from @lowwattlabs/clawsec to @lowwattlabs/frisk
 - Binary names: frisk, frisk-api (formerly clawsec, clawsec-api)
 - Config dirs: ~/.frisk/ (formerly ~/.clawsec/)
-- GitHub repo moved to jchandler187/frisk
+- GitHub repo moved to lowwattlabs/frisk
 - SKILL.md aligned with actual package and binary names
 
 ## v3.0.1 (2026-05-25)
