@@ -1,6 +1,6 @@
 /**
  * ⚡ Frisk v2 - API Middleware
- * Rate limiting, auth, request logging
+ * Rate limiting, auth, request logging, raw body capture for webhooks
  */
 
 const { RateLimiterMemory } = require('rate-limiter-flexible');
@@ -9,6 +9,14 @@ const os = require('os');
 const fs = require('fs');
 
 const FRISK_DIR = process.env.FRISK_HOME || path.join(os.homedir(), '.frisk');
+
+// Routes that skip auth + rate limiting (public endpoints)
+const PUBLIC_PATHS = [
+    '/api/v1/checkout',
+    '/api/v1/webhook',
+    '/api/v1/key',
+    '/health',
+];
 
 // Rate limiter: 5 scans/day for free tier, much higher for API key holders
 const freeLimiter = new RateLimiterMemory({
@@ -36,8 +44,21 @@ function loadApiKeys() {
     return {};
 }
 
+// Raw body capture middleware — stores unparsed body on req.rawBody
+// Required for Stripe webhook signature verification
+const rawBodyCapture = (req, res, buf, encoding) => {
+    if (buf && buf.length > 0) {
+        req.rawBody = buf.toString(encoding || 'utf8');
+    }
+};
+
 // Rate limiter middleware
 const rateLimiter = async (req, res, next) => {
+    // Skip rate limiting for public paths
+    if (PUBLIC_PATHS.some(p => req.path.startsWith(p))) {
+        return next();
+    }
+
     const apiKey = req.headers['x-api-key'] || (req.headers['authorization'] || '').replace('Bearer ', '');
     const keys = loadApiKeys();
 
@@ -74,6 +95,11 @@ const rateLimiter = async (req, res, next) => {
 
 // API key auth (optional - works without, just gets free tier)
 const apiKeyAuth = (req, res, next) => {
+    // Skip auth for public paths
+    if (PUBLIC_PATHS.some(p => req.path.startsWith(p))) {
+        return next();
+    }
+
     const apiKey = req.headers['x-api-key'] || (req.headers['authorization'] || '').replace('Bearer ', '');
     if (apiKey) {
         const keys = loadApiKeys();
@@ -100,5 +126,7 @@ const requestLogger = (req, res, next) => {
 module.exports = {
     rateLimiter,
     apiKeyAuth,
-    requestLogger
+    requestLogger,
+    rawBodyCapture,
+    PUBLIC_PATHS,
 };

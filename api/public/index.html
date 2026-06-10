@@ -24,6 +24,52 @@
         .check-icon { color: #2ea043; font-weight: 700; margin-right: 12px; font-size: 1.1em; }
         .check-name { color: #f0f6fc; font-weight: 600; min-width: 180px; }
         .check-desc { color: #8b949e; }
+
+        /* Pricing section */
+        .pricing { padding: 48px 0 32px; }
+        .pricing h2 { text-align: center; font-size: 2em; color: #f0f6fc; margin-bottom: 8px; }
+        .pricing .pricing-sub { text-align: center; color: #8b949e; margin-bottom: 32px; }
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+        @media (max-width: 700px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+        .pricing-card {
+            background: #161b22; border: 1px solid #21262d; border-radius: 12px;
+            padding: 28px 24px; display: flex; flex-direction: column;
+        }
+        .pricing-card.featured {
+            border-color: #3fb950; box-shadow: 0 0 20px rgba(63, 185, 80, 0.1);
+        }
+        .pricing-card .plan-name { font-size: 1.2em; font-weight: 700; color: #f0f6fc; margin-bottom: 4px; }
+        .pricing-card.featured .plan-name { color: #3fb950; }
+        .pricing-card .plan-price { font-size: 2.4em; font-weight: 800; color: #f0f6fc; margin: 12px 0 4px; }
+        .pricing-card .plan-price .period { font-size: 0.4em; font-weight: 400; color: #8b949e; }
+        .pricing-card .plan-save { color: #d4a72c; font-size: 0.85em; font-weight: 600; margin-bottom: 16px; }
+        .pricing-card .plan-desc { color: #8b949e; font-size: 0.9em; margin-bottom: 20px; }
+        .pricing-card ul { list-style: none; padding: 0; margin: 0 0 24px; flex-grow: 1; }
+        .pricing-card ul li { padding: 6px 0; color: #c9d1d9; font-size: 0.9em; }
+        .pricing-card ul li::before { content: '✓ '; color: #3fb950; font-weight: 700; }
+        .pricing-card ul li.disabled { color: #484f58; }
+        .pricing-card ul li.disabled::before { content: '✗ '; color: #484f58; }
+        .pricing-card .cta-btn {
+            display: block; text-align: center; padding: 12px 24px; border-radius: 8px;
+            font-weight: 600; font-size: 1em; text-decoration: none; transition: background 0.2s;
+        }
+        .pricing-card .cta-btn.primary { background: #2ea043; color: #fff; }
+        .pricing-card .cta-btn.primary:hover { background: #3fb950; }
+        .pricing-card .cta-btn.secondary { background: #21262d; color: #c9d1d9; border: 1px solid #30363d; }
+        .pricing-card .cta-btn.secondary:hover { background: #30363d; }
+        .pricing-card.featured .cta-btn.secondary { border-color: #3fb950; color: #3fb950; }
+        .pricing-card.featured .cta-btn.secondary:hover { background: #0d1117; }
+
+        .comparison { margin-top: 32px; }
+        .comparison h3 { color: #f0f6fc; font-size: 1.2em; margin-bottom: 16px; text-align: center; }
+        .comparison table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .comparison th { color: #8b949e; font-weight: 600; text-align: left; padding: 10px 12px; border-bottom: 1px solid #21262d; }
+        .comparison td { padding: 10px 12px; border-bottom: 1px solid #21262d; }
+        .comparison td:first-child { color: #c9d1d9; }
+        .comparison .yes { color: #3fb950; }
+        .comparison .no { color: #484f58; }
+
         .cta { text-align: center; padding: 40px 0; }
         .cta a {
             display: inline-block; background: #2ea043; color: #fff; padding: 14px 32px;
@@ -70,6 +116,78 @@
             <div class="check"><span class="check-icon">✓</span><span class="check-name">IOC Match</span><span class="check-desc">URLhaus + ThreatFox + Feodo + MalwareBazaar — malicious URLs, IPs, hashes</span></div>
             <div class="check"><span class="check-icon">✓</span><span class="check-name">Behavioral</span><span class="check-desc">Shell injection, eval, fetch-exec, large base64, capability overreach</span></div>
             <div class="check"><span class="check-icon">✓</span><span class="check-name">Prompt Injection</span><span class="check-desc">Instruction overrides, role manipulation, safety bypasses in SKILL.md</span></div>
+        </div>
+
+        <!-- Wedge Pricing Section -->
+        <div class="pricing">
+            <h2>🪓 Upgrade to <span style="color:#3fb950">Wedge</span></h2>
+            <p class="pricing-sub">More scans. Live intel. Priority support.</p>
+
+            <div class="pricing-grid">
+                <div class="pricing-card">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">$0<span class="period">/forever</span></div>
+                    <div class="plan-desc">Basic security scanning</div>
+                    <ul>
+                        <li>5 scans per day</li>
+                        <li>All 7 security checks</li>
+                        <li>Manual threat intel sync</li>
+                        <li class="disabled">Live threat intel updates</li>
+                        <li class="disabled">Priority support</li>
+                    </ul>
+                    <a href="https://github.com/jchandler187/frisk" class="cta-btn secondary">Get Started</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="plan-name">🪓 Wedge Monthly</div>
+                    <div class="plan-price">$5<span class="period">/mo</span></div>
+                    <div class="plan-desc">Pro security at a coffee a month</div>
+                    <ul>
+                        <li>1,000 scans per day</li>
+                        <li>All 7 security checks</li>
+                        <li class="yes">Live threat intel sync</li>
+                        <li class="yes">Priority support</li>
+                        <li class="yes">API key auth</li>
+                    </ul>
+                    <a href="/api/v1/checkout?plan=monthly" class="cta-btn primary">Get API Key →</a>
+                </div>
+
+                <div class="pricing-card featured">
+                    <div class="plan-name">🪓 Wedge Annual</div>
+                    <div class="plan-price">$50<span class="period">/yr</span></div>
+                    <div class="plan-save">Save $10 vs monthly</div>
+                    <div class="plan-desc">Best value — 2 months free</div>
+                    <ul>
+                        <li>1,000 scans per day</li>
+                        <li>All 7 security checks</li>
+                        <li class="yes">Live threat intel sync</li>
+                        <li class="yes">Priority support</li>
+                        <li class="yes">API key auth</li>
+                    </ul>
+                    <a href="/api/v1/checkout?plan=annual" class="cta-btn primary">Get API Key →</a>
+                </div>
+            </div>
+
+            <div class="comparison">
+                <h3>Free vs Wedge</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Free</th>
+                            <th style="color:#3fb950">Wedge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Daily scans</td><td>5</td><td class="yes">1,000</td></tr>
+                        <tr><td>Security checks</td><td class="yes">All 7</td><td class="yes">All 7</td></tr>
+                        <tr><td>Threat intel sync</td><td class="no">Manual</td><td class="yes">Live</td></tr>
+                        <tr><td>API key access</td><td class="no">No</td><td class="yes">Yes</td></tr>
+                        <tr><td>Support</td><td class="no">Community</td><td class="yes">Priority</td></tr>
+                        <tr><td>Rate limit window</td><td>24h</td><td class="yes">1h reset</td></tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="cta">

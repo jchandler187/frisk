@@ -1,6 +1,6 @@
 {
   "name": "@lowwattlabs/frisk",
-  "version": "3.1.1",
+  "version": "3.2.0",
   "description": "\u26a1 Frisk \u2014 Catches leaked credentials and supply-chain threats in ClawHub skills before you install. 9 intel sources, 7 checks, zero phone-home.",
   "bin": {
     "frisk": "./bin/frisk.js",
@@ -22,7 +22,8 @@
     "express": "^4.21.0",
     "rate-limiter-flexible": "^5.0.0",
     "uuid": "^11.1.1",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "stripe": "^18.0.0"
   },
   "author": "Low Watt Labs",
   "license": "MIT-0",
@@ -31,14 +32,16 @@
     "url": "https://github.com/lowwattlabs/frisk.git"
   },
   "keywords": [
-    "security",
+    "api",
     "audit",
     "clawhub",
-    "skills",
-    "verification",
-    "threat-intel",
     "credential-leak",
+    "secret-scan",
+    "security",
+    "skills",
     "supply-chain",
-    "secret-scan"
+    "threat-intel",
+    "verification",
+    "wedge"
   ]
 }
