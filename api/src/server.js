@@ -40,12 +40,14 @@ app.use(require('cors')({
 // Static files
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// API routes
+// API routes (support both direct and /frisk prefix for reverse proxy)
 app.use('/api/v1', routes);
 app.use('/api/v1', stripeRoutes);
+app.use('/frisk/api/v1', routes);
+app.use('/frisk/api/v1', stripeRoutes);
 
-// Health check
-app.get('/health', (req, res) => {
+// Health check (both paths)
+app.get(['/health', '/frisk/health'], (req, res) => {
     res.json({ status: 'ok', version: '3.2.0', uptime: process.uptime() });
 });
 
