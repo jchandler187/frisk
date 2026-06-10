@@ -22,7 +22,7 @@ import tempfile
 import time
 from pathlib import Path
 
-VERSION = "2.5.0"
+VERSION = "3.2.0"
 FRISK_DIR = os.environ.get("FRISK_HOME", os.path.expanduser("~/.frisk"))
 INTEL_DIR = os.environ.get("FRISK_INTEL_DIR", os.path.join(FRISK_DIR, "intel"))
 REPORTS_DIR = os.environ.get("FRISK_REPORTS_DIR", os.path.join(FRISK_DIR, "reports"))
